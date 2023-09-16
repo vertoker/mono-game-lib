@@ -1,4 +1,6 @@
-﻿namespace SceneLib.Interfaces
+﻿using SceneLib.Interfaces.Setups;
+
+namespace SceneLib.Interfaces
 {
     public interface ISceneManager
     {

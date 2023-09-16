@@ -1,6 +1,6 @@
-﻿using SceneLib.Interfaces;
-using SceneLib.Templates.Loaders;
+﻿using SceneLib.Templates.Loaders;
 using SceneLib.Contexts;
+using SceneLib.Interfaces.Setups;
 
 namespace SceneLib.Example
 {
@@ -8,7 +8,7 @@ namespace SceneLib.Example
     {
         public void Setup(SceneContext context)
         {
-            context.AddService(new GraphicsDeviceManagerLoader(context.Game));
+            context.AddService(new GraphicsDeviceManagerLoader());
             context.AddService(new SpriteBatchLoader(context.Game));
         }
     }

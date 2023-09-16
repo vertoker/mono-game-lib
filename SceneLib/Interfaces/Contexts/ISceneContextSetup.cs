@@ -2,7 +2,6 @@
 {
     public interface ISceneContextSetup
     {
-        public void AddService(object service);
-        public void AddServices(params object[] services);
+        public void AddService<T>(T service);
     }
 }

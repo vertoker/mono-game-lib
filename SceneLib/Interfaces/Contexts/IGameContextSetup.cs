@@ -1,4 +1,6 @@
-﻿namespace SceneLib.Interfaces.Contexts
+﻿using SceneLib.Interfaces.Setups;
+
+namespace SceneLib.Interfaces.Contexts
 {
     public interface IGameContextSetup
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using SceneLib.Contexts;
 using SceneLib.Interfaces.Contexts;
 using SceneLib.Interfaces.Kernel;
 using SceneLib.Interfaces.Kernel.Base;
@@ -7,8 +8,10 @@ using System.Collections.Generic;
 
 namespace SceneLib.Core
 {
-    public class SceneKernel : IServiceHandler, IContentHandler
+    public class SceneKernel : IServiceSetup, IServiceHandler, IContentHandler
     {
+        public List<IServiceSetup> setupers = new();
+
         public List<IServiceInitializable> initializables = new();
         public List<IServiceUpdateable> updatables = new();
         public List<IServiceDrawable> drawables = new();
@@ -19,6 +22,9 @@ namespace SceneLib.Core
 
         public void AddService(object service)
         {
+            if (service is IServiceSetup setup)
+                setupers.Add(setup);
+
             if (service is IServiceInitializable initializable)
                 initializables.Add(initializable);
             if (service is IServiceUpdateable updateable)
@@ -32,6 +38,12 @@ namespace SceneLib.Core
                 loaders.Add(load);
             if (service is IContentUnload unload)
                 unloaders.Add(unload);
+        }
+
+        public void Setup(SceneContext context)
+        {
+            foreach (var item in setupers)
+                item.Setup(context);
         }
 
         public void Initialize()

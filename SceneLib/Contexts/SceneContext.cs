@@ -6,29 +6,24 @@ namespace SceneLib.Contexts
 {
     public class SceneContext : ISceneContextSetup
     {
-        private readonly SceneGame _game;
+        private readonly GameContext _gameContext;
         private readonly Scene _scene;
 
-        public Game Game => _game;
+        public GameContext GameContext => _gameContext;
+        public Game Game => _gameContext.Game;
 
-        public SceneContext(SceneGame game, Scene scene)
+        public Scene Scene => _scene;
+        public SceneTypeContainer Services => _scene.Services;
+
+        public SceneContext(GameContext gameContext, Scene scene)
         {
-            _game = game;
+            _gameContext = gameContext;
             _scene = scene;
         }
 
-        public void AddService(object service)
+        public void AddService<T>(T service)
         {
-            _scene.ServiceKernel.AddService(service);
-            _game.Services.AddService(service);
-        }
-        public void AddServices(params object[] services)
-        {
-            foreach (object service in services)
-            {
-                _scene.ServiceKernel.AddService(service);
-                _game.Services.AddService(service);
-            }
+            _scene.AddService(service);
         }
     }
 }

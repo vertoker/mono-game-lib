@@ -1,6 +1,6 @@
 ﻿using SceneLib.Contexts;
 
-namespace SceneLib.Interfaces
+namespace SceneLib.Interfaces.Setups
 {
     public interface IGameSetup
     {

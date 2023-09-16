@@ -1,18 +1,20 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using SceneLib.Interfaces.Kernel.Base;
+using SceneLib.Contexts;
+using System.Xml.Linq;
 
 namespace SceneLib.Templates.Loaders
 {
-    public class GraphicsDeviceManagerLoader : IContentLoad
+    public class GraphicsDeviceManagerLoader : IServiceSetup, IContentLoad
     {
-        private readonly Game _game;
+        private Game _game;
 
         public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
-        public GraphicsDeviceManagerLoader(Game game)
+        public void Setup(SceneContext context)
         {
-            _game = game;
+            _game = context.Game;
         }
         public void Load(ContentManager manager)
         {

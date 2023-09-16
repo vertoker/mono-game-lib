@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SceneLib.Interfaces;
 using SceneLib.Contexts;
 using System;
+using SceneLib.Interfaces.Setups;
 
 namespace SceneLib.Core
 {
@@ -25,38 +26,38 @@ namespace SceneLib.Core
 
         protected override void Initialize()
         {
-            Project.ServiceKernel.Initialize();
+            Project.Kernel.Initialize();
             base.Initialize();
         }
         protected override void LoadContent()
         {
-            Project.ServiceKernel.Load(Content);
+            Project.Kernel.Load(Content);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            Project.ServiceKernel.Update(gameTime);
-            ActiveScene?.ServiceKernel.Update(gameTime);
+            Project.Kernel.Update(gameTime);
+            ActiveScene?.Kernel.Update(gameTime);
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime)
         {
-            Project.ServiceKernel.Draw(gameTime);
-            ActiveScene?.ServiceKernel.Draw(gameTime);
+            Project.Kernel.Draw(gameTime);
+            ActiveScene?.Kernel.Draw(gameTime);
             base.Draw(gameTime);
         }
 
         protected override void UnloadContent()
         {
-            ActiveScene?.ServiceKernel.Unload(Content);
-            Project.ServiceKernel.Unload(Content);
+            ActiveScene?.Kernel.Unload(Content);
+            Project.Kernel.Unload(Content);
         }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                ActiveScene?.ServiceKernel.Dispose();
-                Project.ServiceKernel.Dispose();
+                ActiveScene?.Kernel.Dispose();
+                Project.Kernel.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -72,11 +73,11 @@ namespace SceneLib.Core
 
         public void Open<TScene>() where TScene : ISceneSetup
         {
-            ActiveScene?.ServiceKernel.Dispose();
-            ActiveScene?.ServiceKernel.Unload(Content);
+            ActiveScene?.Kernel.Dispose();
+            ActiveScene?.Kernel.Unload(Content);
             ActiveScene = Scenes[typeof(TScene)];
-            ActiveScene.ServiceKernel.Load(Content);
-            ActiveScene.ServiceKernel.Initialize();
+            ActiveScene.Kernel.Load(Content);
+            ActiveScene.Kernel.Initialize();
         }
     }
 }

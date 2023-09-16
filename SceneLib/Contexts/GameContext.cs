@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using SceneLib.Interfaces;
 using SceneLib.Interfaces.Contexts;
 using SceneLib.Core;
+using SceneLib.Interfaces.Setups;
 
 namespace SceneLib.Contexts
 {
@@ -22,15 +22,16 @@ namespace SceneLib.Contexts
         {
             var sceneItem = new Scene(typeof(TScene));
             _game.AddProject(sceneItem);
-            var context = new SceneContext(_game, sceneItem);
+            var context = new SceneContext(this, sceneItem);
             project.Setup(context);
         }
         public void AddScene<TScene>(TScene scene) where TScene : ISceneSetup
         {
             var sceneItem = new Scene(typeof(TScene));
             _game.AddScene(sceneItem);
-            var context = new SceneContext(_game, sceneItem);
+            var context = new SceneContext(this, sceneItem);
             scene.Setup(context);
+
         }
     }
 }

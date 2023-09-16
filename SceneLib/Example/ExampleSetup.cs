@@ -1,5 +1,5 @@
-﻿using SceneLib.Interfaces;
-using SceneLib.Contexts;
+﻿using SceneLib.Contexts;
+using SceneLib.Interfaces.Setups;
 
 namespace SceneLib.Example
 {
