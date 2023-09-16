@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SceneFramework.Interfaces.Kernel.Base;
+using SceneLib.Interfaces.Kernel.Base;
 
-namespace SceneFramework.Interfaces.Kernel
+namespace SceneLib.Interfaces.Kernel
 {
     public interface IServiceHandler : IServiceInitializable, IServiceUpdateable, IServiceDrawable, IServiceDisposable
     {

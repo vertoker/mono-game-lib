@@ -1,7 +1,6 @@
-﻿using Microsoft.Xna.Framework.Content;
-using SceneFramework.Interfaces.Kernel.Base;
+﻿using SceneLib.Interfaces.Kernel.Base;
 
-namespace SceneFramework.Interfaces.Kernel
+namespace SceneLib.Interfaces.Kernel
 {
     public interface IContentHandler : IContentLoad, IContentUnload
     {

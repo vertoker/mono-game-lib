@@ -1,14 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using SceneFramework.Interfaces.Kernel.Base;
+using SceneLib.Interfaces.Kernel.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SceneFramework.Templates.Loaders
+namespace SceneLib.Templates.Loaders
 {
     public class SpriteBatchLoader : IContentLoad
     {

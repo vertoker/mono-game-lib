@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
-using SceneFramework.Interfaces.Kernel.Base;
+using SceneLib.Interfaces.Kernel.Base;
 
-namespace SceneFramework.Templates.Loaders
+namespace SceneLib.Templates.Loaders
 {
     public class GraphicsDeviceManagerLoader : IContentLoad
     {

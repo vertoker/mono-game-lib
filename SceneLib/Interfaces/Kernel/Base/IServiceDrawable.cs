@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace SceneFramework.Interfaces.Kernel.Base
+namespace SceneLib.Interfaces.Kernel.Base
 {
     public interface IServiceDrawable
     {

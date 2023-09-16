@@ -1,18 +1,13 @@
-﻿using SceneFramework.Core.Model;
-using SceneFramework.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SceneLib.Interfaces;
+using SceneLib.Contexts;
 
-namespace SceneFramework.Example
+namespace SceneLib.Example
 {
     public class ExampleSetup : IGameSetup
     {
-        public void Setup(ISceneSetup setup, GameContext context)
+        public void Setup(GameContext context)
         {
-            setup.AddProject(new ProjectScene());
+            context.AddProject(new ExampleProjectScene());
         }
     }
 }

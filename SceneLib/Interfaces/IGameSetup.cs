@@ -1,15 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using SceneFramework.Core.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SceneLib.Contexts;
 
-namespace SceneFramework.Interfaces
+namespace SceneLib.Interfaces
 {
     public interface IGameSetup
     {
-        public void Setup(ISceneSetup setup, GameContext context);
+        public void Setup(GameContext context);
     }
 }

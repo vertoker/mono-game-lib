@@ -1,9 +1,7 @@
-﻿using SceneFramework.Core;
-
-namespace SceneFramework.Interfaces
+﻿namespace SceneLib.Interfaces
 {
     public interface ISceneManager
     {
-        public void Open<TScene>() where TScene : BaseScene;
+        public void Open<TScene>() where TScene : ISceneSetup;
     }
 }

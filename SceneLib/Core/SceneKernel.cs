@@ -1,17 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
-using SceneFramework.Interfaces.Kernel;
-using SceneFramework.Interfaces.Kernel.Base;
-using System;
+using Microsoft.Xna.Framework.Content;
+using SceneLib.Interfaces.Contexts;
+using SceneLib.Interfaces.Kernel;
+using SceneLib.Interfaces.Kernel.Base;
 using System.Collections.Generic;
 
-namespace SceneFramework.Core.Model
+namespace SceneLib.Core
 {
-    public class ServiceKernel : IKernelSetup, IServiceHandler
+    public class SceneKernel : IServiceHandler, IContentHandler
     {
         public List<IServiceInitializable> initializables = new();
         public List<IServiceUpdateable> updatables = new();
         public List<IServiceDrawable> drawables = new();
         public List<IServiceDisposable> disposeables = new();
+
+        public List<IContentLoad> loaders = new();
+        public List<IContentUnload> unloaders = new();
 
         public void AddService(object service)
         {
@@ -23,6 +27,11 @@ namespace SceneFramework.Core.Model
                 drawables.Add(drawable);
             if (service is IServiceDisposable disposable)
                 disposeables.Add(disposable);
+
+            if (service is IContentLoad load)
+                loaders.Add(load);
+            if (service is IContentUnload unload)
+                unloaders.Add(unload);
         }
 
         public void Initialize()
@@ -44,6 +53,17 @@ namespace SceneFramework.Core.Model
         {
             foreach (var item in disposeables)
                 item.Dispose();
+        }
+
+        public void Load(ContentManager manager)
+        {
+            foreach (var item in loaders)
+                item.Load(manager);
+        }
+        public void Unload(ContentManager manager)
+        {
+            foreach (var item in unloaders)
+                item.Unload(manager);
         }
     }
 }

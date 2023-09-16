@@ -1,101 +1,82 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using SceneFramework.Core.Model;
-using SceneFramework.Interfaces.Kernel;
 using System.Collections.Generic;
+using SceneLib.Interfaces;
+using SceneLib.Contexts;
 using System;
-using static System.Formats.Asn1.AsnWriter;
-using SceneFramework.Interfaces;
 
-namespace SceneFramework.Core
+namespace SceneLib.Core
 {
-    public class SceneGame : Game, ISceneSetup, ISceneManager
+    public class SceneGame : Game, ISceneManager
     {
-        private readonly Dictionary<Type, BaseScene> _scenes;
-        private readonly GameContext _context;
+        public readonly Dictionary<Type, Scene> Scenes;
+        public Scene Project;
 
-        private BaseScene _project;
-        private BaseScene _activeScene;
+        public Scene ActiveScene;
 
         public SceneGame(IGameSetup setup)
         {
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            _scenes = new Dictionary<Type, BaseScene>();
-            _context = new GameContext()
-            {
-                Game = this,
-                Content = Content
-            };
-            setup.Setup(this, _context);
+            Scenes = new Dictionary<Type, Scene>();
+            var context = new GameContext(this);
+            setup.Setup(context);
         }
 
         protected override void Initialize()
         {
-            _project.ServiceKernel.Initialize();
+            Project.ServiceKernel.Initialize();
             base.Initialize();
         }
         protected override void LoadContent()
         {
-            _project.LoaderKernel.Load(Content);
+            Project.ServiceKernel.Load(Content);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            _project.ServiceKernel.Update(gameTime);
-            _activeScene?.ServiceKernel.Update(gameTime);
+            Project.ServiceKernel.Update(gameTime);
+            ActiveScene?.ServiceKernel.Update(gameTime);
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime)
         {
-            _project.ServiceKernel.Draw(gameTime);
-            _activeScene?.ServiceKernel.Draw(gameTime);
+            Project.ServiceKernel.Draw(gameTime);
+            ActiveScene?.ServiceKernel.Draw(gameTime);
             base.Draw(gameTime);
         }
 
         protected override void UnloadContent()
         {
-            _activeScene?.LoaderKernel.Unload(Content);
-            _project.LoaderKernel.Unload(Content);
+            ActiveScene?.ServiceKernel.Unload(Content);
+            Project.ServiceKernel.Unload(Content);
         }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _activeScene?.ServiceKernel.Dispose();
-                _project.ServiceKernel.Dispose();
+                ActiveScene?.ServiceKernel.Dispose();
+                Project.ServiceKernel.Dispose();
             }
             base.Dispose(disposing);
         }
 
-        public void AddProject<TScene>(TScene project) where TScene : BaseScene
+        public void AddProject(Scene scene)
         {
-            AddContext(project);
-            _project = project;
+            Project = scene;
         }
-        public void AddScene<TScene>(TScene scene) where TScene : BaseScene
+        public void AddScene(Scene scene)
         {
-            AddContext(scene);
-            _scenes.Add(scene.GetType(), scene);
-        }
-        private void AddContext(BaseScene scene)
-        {
-            var context = new SceneContext()
-            {
-                Game = this
-            };
-            scene.Context = context;
+            Scenes.Add(scene.SceneType, scene);
         }
 
-        public void Open<TScene>() where TScene : BaseScene
+        public void Open<TScene>() where TScene : ISceneSetup
         {
-            _activeScene?.ServiceKernel.Dispose();
-            _activeScene?.LoaderKernel.Unload(Content);
-            _activeScene = _scenes[typeof(TScene)];
-            _activeScene?.LoaderKernel.Load(Content);
-            _activeScene.ServiceKernel.Initialize();
+            ActiveScene?.ServiceKernel.Dispose();
+            ActiveScene?.ServiceKernel.Unload(Content);
+            ActiveScene = Scenes[typeof(TScene)];
+            ActiveScene.ServiceKernel.Load(Content);
+            ActiveScene.ServiceKernel.Initialize();
         }
     }
 }
