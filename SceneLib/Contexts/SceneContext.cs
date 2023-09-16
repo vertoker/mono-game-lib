@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using SceneLib.Interfaces.Contexts;
 using SceneLib.Core;
+using SceneLib.Interfaces.Kernel.Base;
 
 namespace SceneLib.Contexts
 {
@@ -24,6 +25,8 @@ namespace SceneLib.Contexts
         public void AddService<T>(T service)
         {
             _scene.AddService(service);
+            if (service is IServiceSetup setup)
+                setup.Setup(this);
         }
     }
 }

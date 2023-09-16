@@ -6,12 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SceneLib.Templates.Base.Services
+namespace SceneLib.Templates.Base.Loader
 {
-    public abstract class BaseServiceLoaderArray<T> : IContentLoad, IContentUnload
+    public abstract class BaseValuesLoader<T> : BaseValuesHandler<T>, IContentLoad, IContentUnload
     {
-        public T[] Values { get; private set; }
-
         public abstract string[] AssetNames { get; }
 
         public void Load(ContentManager manager)

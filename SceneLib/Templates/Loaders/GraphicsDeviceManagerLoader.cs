@@ -3,14 +3,13 @@ using Microsoft.Xna.Framework;
 using SceneLib.Interfaces.Kernel.Base;
 using SceneLib.Contexts;
 using System.Xml.Linq;
+using SceneLib.Templates.Base.Loader;
 
 namespace SceneLib.Templates.Loaders
 {
-    public class GraphicsDeviceManagerLoader : IServiceSetup, IContentLoad
+    public class GraphicsDeviceManagerLoader : BaseValueHandler<GraphicsDeviceManager>, IServiceSetup, IContentLoad
     {
         private Game _game;
-
-        public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
         public void Setup(SceneContext context)
         {
@@ -18,7 +17,7 @@ namespace SceneLib.Templates.Loaders
         }
         public void Load(ContentManager manager)
         {
-            GraphicsDeviceManager = new GraphicsDeviceManager(_game);
+            Value = new GraphicsDeviceManager(_game);
         }
     }
 }
