@@ -10,7 +10,7 @@ namespace SceneLib.Core
     public class SceneGame : Game, ISceneManager
     {
         public readonly Dictionary<Type, Scene> Scenes;
-        public Scene Project;
+        public readonly Scene Project;
 
         public Scene ActiveScene;
 
@@ -18,6 +18,11 @@ namespace SceneLib.Core
         {
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            var graphics = new GraphicsDeviceManager(this);
+
+            Project = new Scene();
+            Project.Services.Add(graphics);
 
             Scenes = new Dictionary<Type, Scene>();
             var context = new GameContext(this);
@@ -62,13 +67,9 @@ namespace SceneLib.Core
             base.Dispose(disposing);
         }
 
-        public void AddProject(Scene scene)
+        public void AddScene(Type type,Scene scene)
         {
-            Project = scene;
-        }
-        public void AddScene(Scene scene)
-        {
-            Scenes.Add(scene.SceneType, scene);
+            Scenes.Add(type, scene);
         }
 
         public void Open<TScene>() where TScene : ISceneSetup

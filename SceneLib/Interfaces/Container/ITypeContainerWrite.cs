@@ -8,9 +8,9 @@ namespace SceneLib.Interfaces.Container
 {
     public interface ITypeContainerWrite
     {
-        public void Add<TService>(TService service);
+        public void Add<TService>(TService service) where TService : class;
         public void Add(Type type, object service);
-        public void Remove<TService>();
+        public void Remove<TService>() where TService : class;
         public void Remove(Type type);
     }
 }

@@ -16,7 +16,7 @@ namespace SceneLib.Templates.Loaders
     {
         private Game _game;
 
-        public void Setup(SceneContext context)
+        public void Setup(ServiceContext context)
         {
             _game = context.Game;
         }

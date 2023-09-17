@@ -11,7 +11,7 @@ namespace SceneLib.Core
     {
         private Dictionary<Type, object> _services = new();
 
-        public void Add<TService>(TService service)
+        public void Add<TService>(TService service) where TService : class
         {
             Add(typeof(TService), service);
         }
@@ -20,16 +20,19 @@ namespace SceneLib.Core
             _services.Add(type, service);
         }
 
-        public TService Get<TService>()
+        public TService Get<TService>() where TService : class
         {
-            return (TService)Get(typeof(TService));
+            var service = Get(typeof(TService));
+            return service == null ? null : (TService)service;
         }
         public object Get(Type type)
         {
-            return _services[type];
+            if (_services.TryGetValue(type, out var service))
+                return service;
+            return null;
         }
 
-        public void Remove<TService>()
+        public void Remove<TService>() where TService : class
         {
             Remove(typeof(TService));
         }

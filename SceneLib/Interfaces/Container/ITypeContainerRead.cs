@@ -8,7 +8,7 @@ namespace SceneLib.Interfaces.Container
 {
     public interface ITypeContainerRead
     {
-        public TService Get<TService>();
+        public TService Get<TService>() where TService : class;
         public object Get(Type type);
     }
 }

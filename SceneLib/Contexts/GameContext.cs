@@ -6,7 +6,7 @@ using SceneLib.Interfaces.Setups;
 
 namespace SceneLib.Contexts
 {
-    public class GameContext : IGameContextSetup
+    public class GameContext : IContextGame
     {
         private readonly SceneGame _game;
 
@@ -20,18 +20,15 @@ namespace SceneLib.Contexts
 
         public void AddProject<TScene>(TScene project) where TScene : ISceneSetup
         {
-            var sceneItem = new Scene(typeof(TScene));
-            _game.AddProject(sceneItem);
-            var context = new SceneContext(this, sceneItem);
+            var context = new SceneContext(this, _game.Project);
             project.Setup(context);
         }
         public void AddScene<TScene>(TScene scene) where TScene : ISceneSetup
         {
-            var sceneItem = new Scene(typeof(TScene));
-            _game.AddScene(sceneItem);
-            var context = new SceneContext(this, sceneItem);
+            var sceneItem = new Scene();
+            _game.AddScene(typeof(TScene), sceneItem);
+            var context = new SceneContext(this, sceneItem, _game.Project);
             scene.Setup(context);
-
         }
     }
 }

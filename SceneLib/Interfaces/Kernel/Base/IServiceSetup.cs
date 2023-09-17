@@ -1,9 +1,10 @@
-﻿using SceneLib.Interfaces.Setups;
+﻿using SceneLib.Contexts;
+using SceneLib.Interfaces.Setups;
 
 namespace SceneLib.Interfaces.Kernel.Base
 {
-    public interface IServiceSetup : ISceneSetup
+    public interface IServiceSetup
     {
-
+        public void Setup(ServiceContext context);
     }
 }

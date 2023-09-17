@@ -8,7 +8,6 @@ namespace SceneLib.Example
     {
         public void Setup(SceneContext context)
         {
-            context.AddService(new GraphicsDeviceManagerLoader());
             context.AddService(new SpriteBatchLoader());
         }
     }

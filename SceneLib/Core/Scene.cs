@@ -7,19 +7,11 @@ namespace SceneLib.Core
     {
         public readonly SceneTypeContainer Services;
         public readonly SceneKernel Kernel;
-        public readonly Type SceneType;
 
-        public Scene(Type sceneType)
+        public Scene()
         {
             Services = new SceneTypeContainer();
             Kernel = new SceneKernel();
-            SceneType = sceneType;
-        }
-
-        public void AddService<T>(T service)
-        {
-            Kernel.AddService(service);
-            Services.Add(service);
         }
     }
 }
