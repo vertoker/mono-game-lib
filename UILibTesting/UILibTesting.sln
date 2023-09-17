@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UILibTesting", "UILibTesting.csproj", "{10503674-33DC-461B-B4F2-37EEE1DBFF4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UILib", "..\UILib\UILib.csproj", "{C0F31B3A-C46B-4ECF-AC2B-D17F1AD06AA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SceneLib", "..\..\SceneLib\SceneLib\SceneLib.csproj", "{4E46815D-ACE3-43D5-ACE3-E33CFB800F42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10503674-33DC-461B-B4F2-37EEE1DBFF4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10503674-33DC-461B-B4F2-37EEE1DBFF4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10503674-33DC-461B-B4F2-37EEE1DBFF4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10503674-33DC-461B-B4F2-37EEE1DBFF4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0F31B3A-C46B-4ECF-AC2B-D17F1AD06AA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0F31B3A-C46B-4ECF-AC2B-D17F1AD06AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0F31B3A-C46B-4ECF-AC2B-D17F1AD06AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0F31B3A-C46B-4ECF-AC2B-D17F1AD06AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E46815D-ACE3-43D5-ACE3-E33CFB800F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E46815D-ACE3-43D5-ACE3-E33CFB800F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E46815D-ACE3-43D5-ACE3-E33CFB800F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E46815D-ACE3-43D5-ACE3-E33CFB800F42}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72A7DB4F-DD9E-45B4-866E-2D6D77693685}
+	EndGlobalSection
+EndGlobal
