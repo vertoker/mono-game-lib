@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "g/jmAQhbs6i9v+6Ctfw1jTh1OPNHrZmzjaSOlMn6zSYBdjFJ7nvB2sgtw1cvQuqgfdldbPq5XlIT2Gz9JYx3Tg==",
+  "success": true,
+  "projectFilePath": "E:\\Projects\\Monogame\\RenderHierarchyLib\\TestingDesktop\\TestingDesktop.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\vertog\\.nuget\\packages\\monogame.content.builder.task\\3.8.1.303\\monogame.content.builder.task.3.8.1.303.nupkg.sha512",
+    "C:\\Users\\vertog\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.1.303\\monogame.framework.desktopgl.3.8.1.303.nupkg.sha512"
+  ],
+  "logs": []
+}
