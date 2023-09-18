@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingDesktop", "TestingDesktop.csproj", "{E688F1E8-406B-4A60-907A-EDB3287D9359}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RenderHierarchyLib", "..\RenderHierarchyLib\RenderHierarchyLib.csproj", "{C89D6D50-9425-42E2-95CF-3DCE4A850313}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E688F1E8-406B-4A60-907A-EDB3287D9359}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E688F1E8-406B-4A60-907A-EDB3287D9359}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E688F1E8-406B-4A60-907A-EDB3287D9359}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C89D6D50-9425-42E2-95CF-3DCE4A850313}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C89D6D50-9425-42E2-95CF-3DCE4A850313}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C89D6D50-9425-42E2-95CF-3DCE4A850313}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C89D6D50-9425-42E2-95CF-3DCE4A850313}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
