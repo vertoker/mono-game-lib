@@ -7,7 +7,10 @@ namespace TestingDesktop
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
+
         private SpriteBatch _spriteBatch;
+        private HierarchySpriteBatch _hierarchySpriteBatch;
+        private Texture2D _texture;
 
         public Game1()
         {
@@ -26,6 +29,8 @@ namespace TestingDesktop
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _hierarchySpriteBatch = new HierarchySpriteBatch(GraphicsDevice);
+            _texture = Content.Load<Texture2D>("Test");
 
             // TODO: use this.Content to load your game content here
         }
@@ -44,7 +49,10 @@ namespace TestingDesktop
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _hierarchySpriteBatch.Begin();
+            _hierarchySpriteBatch.Render(_texture);
+            //_hierarchySpriteBatch.Draw(_texture, new Vector2(10, 10), null, Color.White, 0, new Vector2(0, 0), new Vector2(0.01f, 0.01f), SpriteEffects.None, 0);
+            _hierarchySpriteBatch.End();
 
             base.Draw(gameTime);
         }
