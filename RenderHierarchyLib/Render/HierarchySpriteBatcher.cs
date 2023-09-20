@@ -25,16 +25,14 @@ namespace RenderHierarchyLib.Core
 
         private VertexPositionColorTexture[] _vertexArray;
 
-        public HierarchySpriteBatcher(GraphicsDevice device, int capacity = 0)
+        public HierarchySpriteBatcher(GraphicsDevice device, int capacity = 256)
         {
             _device = device;
-            capacity = ((capacity > 0) ? ((capacity + 63) & -64) : 256);
+            capacity = 256;// ((capacity > 0) ? ((capacity + 63) & -64) : 256);
             _batchItemList = new HierarchySpriteBatchItem[capacity];
             _batchItemCount = 0;
             for (int i = 0; i < capacity; i++)
-            {
                 _batchItemList[i] = new HierarchySpriteBatchItem();
-            }
 
             EnsureArrayCapacity(capacity);
         }
@@ -131,7 +129,7 @@ namespace RenderHierarchyLib.Core
                     int num5 = 0;
                     while (num5 < num4)
                     {
-                        HierarchySpriteBatchItem spriteBatchItem = _batchItemList[num];
+                        var spriteBatchItem = _batchItemList[num];
                         if (spriteBatchItem.Texture != texture2D)
                         {
                             FlushVertexArray(start, num3, effect, texture2D);

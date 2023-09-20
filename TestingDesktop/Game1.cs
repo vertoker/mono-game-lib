@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RenderHierarchyLib.Models.Transform;
+using RenderHierarchyLib;
 
 namespace TestingDesktop
 {
@@ -8,8 +10,10 @@ namespace TestingDesktop
     {
         private GraphicsDeviceManager _graphics;
 
+        private HierarchyRenderBatch _hierarchySpriteBatch;
+        private Camera _camera;
+
         private SpriteBatch _spriteBatch;
-        private HierarchySpriteBatch _hierarchySpriteBatch;
         private Texture2D _texture;
 
         public Game1()
@@ -17,6 +21,7 @@ namespace TestingDesktop
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            _camera = new Camera(new TransformCamera());
         }
 
         protected override void Initialize()
@@ -29,7 +34,7 @@ namespace TestingDesktop
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _hierarchySpriteBatch = new HierarchySpriteBatch(GraphicsDevice);
+            _hierarchySpriteBatch = new HierarchyRenderBatch(GraphicsDevice, _camera);
             _texture = Content.Load<Texture2D>("Test");
 
             // TODO: use this.Content to load your game content here
@@ -50,9 +55,16 @@ namespace TestingDesktop
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _hierarchySpriteBatch.Begin();
-            _hierarchySpriteBatch.Render(_texture);
-            //_hierarchySpriteBatch.Draw(_texture, new Vector2(10, 10), null, Color.White, 0, new Vector2(0, 0), new Vector2(0.01f, 0.01f), SpriteEffects.None, 0);
+            //_hierarchySpriteBatch.Draw(_texture, new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One * 0.01f, SpriteEffects.None, 0);
+            _hierarchySpriteBatch.RenderTest(_texture);
             _hierarchySpriteBatch.End();
+
+
+            
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(_texture, new Vector2(20,20), Color.White);
+            _spriteBatch.End();
+            
 
             base.Draw(gameTime);
         }

@@ -1,4 +1,4 @@
-﻿using RenderHierarchyLib.Models;
+﻿using RenderHierarchyLib.Models.Transform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +9,9 @@ namespace RenderHierarchyLib
 {
     public class Camera
     {
-        private readonly TransformCamera2D _transform;
+        private readonly TransformCamera _transform;
 
-        public Camera(TransformCamera2D transform)
+        public Camera(TransformCamera transform)
         {
             _transform = transform;
         }
