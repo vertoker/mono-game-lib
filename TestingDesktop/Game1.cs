@@ -60,11 +60,11 @@ namespace TestingDesktop
             _hierarchySpriteBatch.End();
 
 
-            
+            /*
             _spriteBatch.Begin();
             _spriteBatch.Draw(_texture, new Vector2(20,20), Color.White);
             _spriteBatch.End();
-            
+            */
 
             base.Draw(gameTime);
         }

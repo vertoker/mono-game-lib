@@ -28,7 +28,7 @@ namespace RenderHierarchyLib.Core
         public HierarchySpriteBatcher(GraphicsDevice device, int capacity = 256)
         {
             _device = device;
-            capacity = 256;// ((capacity > 0) ? ((capacity + 63) & -64) : 256);
+            capacity = (capacity > 0) ? ((capacity + 63) & -64) : 256;
             _batchItemList = new HierarchySpriteBatchItem[capacity];
             _batchItemCount = 0;
             for (int i = 0; i < capacity; i++)
@@ -93,22 +93,9 @@ namespace RenderHierarchyLib.Core
             _vertexArray = new VertexPositionColorTexture[4 * numBatchItems];
         }
 
-        public unsafe void DrawBatch(SpriteSortMode sortMode, Effect effect)
+        public unsafe void DrawBatch()
         {
-            if (effect != null && effect.IsDisposed)
-            {
-                throw new ObjectDisposedException("effect");
-            }
-
-            if (_batchItemCount == 0)
-            {
-                return;
-            }
-
-            if ((uint)(sortMode - 2) <= 2u)
-            {
-                Array.Sort(_batchItemList, 0, _batchItemCount);
-            }
+            if (_batchItemCount == 0) return;
 
             int num = 0;
             int num2 = _batchItemCount;
@@ -132,7 +119,7 @@ namespace RenderHierarchyLib.Core
                         var spriteBatchItem = _batchItemList[num];
                         if (spriteBatchItem.Texture != texture2D)
                         {
-                            FlushVertexArray(start, num3, effect, texture2D);
+                            FlushVertexArray(start, num3);
                             texture2D = spriteBatchItem.Texture;
                             start = (num3 = 0);
                             ptr2 = ptr;
@@ -151,34 +138,19 @@ namespace RenderHierarchyLib.Core
                     }
                 }
 
-                FlushVertexArray(start, num3, effect, texture2D);
+                FlushVertexArray(start, num3);
                 num2 -= num4;
             }
 
             _batchItemCount = 0;
         }
 
-        private void FlushVertexArray(int start, int end, Effect effect, Texture texture)
+        private void FlushVertexArray(int start, int end)
         {
-            if (start == end)
-            {
-                return;
-            }
-
+            if (start == end) return;
             int num = end - start;
-            if (effect != null)
-            {
-                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    _device.Textures[0] = texture;
-                    _device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, _vertexArray, 0, num, _index, 0, num / 4 * 2, VertexPositionColorTexture.VertexDeclaration);
-                }
-            }
-            else
-            {
-                _device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, _vertexArray, 0, num, _index, 0, num / 4 * 2, VertexPositionColorTexture.VertexDeclaration);
-            }
+
+            _device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, _vertexArray, 0, num, _index, 0, num / 4 * 2, VertexPositionColorTexture.VertexDeclaration);
         }
     }
 }
