@@ -26,3 +26,5 @@ E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\obj\Debug\net6.0\refint\T
 E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\obj\Debug\net6.0\TestingDesktop.pdb
 E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\obj\Debug\net6.0\TestingDesktop.genruntimeconfig.cache
 E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\obj\Debug\net6.0\ref\TestingDesktop.dll
+E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\bin\Debug\net6.0\Content\Test2.xnb
+E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\bin\Debug\net6.0\Content\Test3.xnb

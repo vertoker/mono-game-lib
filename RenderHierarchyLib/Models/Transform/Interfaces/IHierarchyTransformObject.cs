@@ -7,6 +7,6 @@ namespace RenderHierarchyLib.Models.Transform.Interfaces
     {
         public Anchor Anchor { get; }
         public Anchor Pivot { get; }
-        public Color Color { get; }
+        public int Depth { get; }
     }
 }

@@ -5,9 +5,9 @@ namespace RenderHierarchyLib.Models.Transform
 {
     public struct TransformObject : ITransformObject
     {
-        public Vector2 Pos { get; private set; }
-        public float Rot { get; private set; }
-        public Vector2 Sca { get; private set; }
+        public Vector2 Pos { get; set; }
+        public float Rot { get; set; }
+        public Vector2 Sca { get; set; }
 
         public TransformObject()
         {

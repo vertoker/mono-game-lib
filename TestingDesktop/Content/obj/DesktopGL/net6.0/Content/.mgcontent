@@ -4,9 +4,13 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/01_Square.png</File>
     <File>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/04_Circle.png</File>
+    <File>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/17_TriangleBoldOutline.png</File>
   </SourceFiles>
   <DestFiles>
+    <File>Test2.png</File>
     <File>Test.png</File>
+    <File>Test3.png</File>
   </DestFiles>
 </SourceFileCollection>
