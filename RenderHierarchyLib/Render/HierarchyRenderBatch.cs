@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using RenderHierarchyLib;
 using RenderHierarchyLib.Core;
+using RenderHierarchyLib.Extensions;
 using RenderHierarchyLib.Graphics;
 using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Models.Enum;
@@ -116,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         #region Render Methods
-        public void Render(TextureView2D view, RenderTransformObject transform) => 
+        public void Render(TextureView2D view, RenderObject transform) => 
             Render(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
         public void Render(TextureView2D view, TransformObject transform, Anchor anchor, Anchor pivot, int depth) =>
@@ -127,7 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 pos, rot, sca, anchor, pivot, depth);
 
         public void Render(Texture2D texture, Rectangle rectangle, Color color,
-            RenderTransformObject transform) =>
+            RenderObject transform) =>
             Render(texture,
                 new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
                 new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
@@ -146,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 color, color, color, color, pos, rot, sca, anchor, pivot, depth);
 
         public void Render(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            RenderTransformObject transform) =>
+            RenderObject transform) =>
             Render(texture,
                 new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
                 new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
@@ -165,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 colorTL, colorTR, colorBL, colorBR, pos, rot, sca, anchor, pivot, depth);
 
         public void Render(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
-            RenderTransformObject transform) =>
+            RenderObject transform) =>
             Render(texture, viewStart, viewEnd, color, color, color, color,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
         public void Render(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
@@ -178,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 pos, rot, sca, anchor, pivot, depth);
 
         public void Render(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            RenderTransformObject transform) =>
+            RenderObject transform) =>
             Render(texture, viewStart, viewEnd, colorTL, colorTR, colorBL, colorBR,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
         public void Render(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
@@ -196,7 +197,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var anchorPos = _camera.GetScreenAnchorPoint(anchor);
             var pixelsSca = sca * _camera.PixelScale;
-            CalculateRectangle(anchorPos + pos, rot, pixelsSca, pivot, 
+            CalculateRectangle(anchorPos + pos * _camera.PixelScale, rot, pixelsSca, pivot, 
                 out var TL, out var TR, out var BL, out var BR);
 
             spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), colorTL, viewStart);
@@ -207,62 +208,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void CalculateRectangle(Vector2 pos, float rot, Vector2 pixelSize, Anchor pivot, out Vector2 TL, out Vector2 TR, out Vector2 BL, out Vector2 BR)
         {
-            var sin = MathF.Sin(MathHelper.ToRadians(rot));
-            var cos = MathF.Cos(MathHelper.ToRadians(rot));
+            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
+            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
 
-            CalculateRectangle(pixelSize, pivot, out var TL2, out var BR2);
+            pixelSize.GetBordersRectangleByPivot(pivot, out var TL2, out var BR2);
 
+            TL = MathExtensions.RotateVector(TL2.X, TL2.Y, pos, sin, cos);
+            TR = MathExtensions.RotateVector(BR2.X, TL2.Y, pos, sin, cos);
+            BL = MathExtensions.RotateVector(TL2.X, BR2.Y, pos, sin, cos);
+            BR = MathExtensions.RotateVector(BR2.X, BR2.Y, pos, sin, cos);
+
+            /*
             TL = new Vector2(pos.X + TL2.X * cos - TL2.Y * sin, pos.Y + TL2.X * sin + TL2.Y * cos);
             TR = new Vector2(pos.X + BR2.X * cos - TL2.Y * sin, pos.Y + BR2.X * sin + TL2.Y * cos);
             BL = new Vector2(pos.X + TL2.X * cos - BR2.Y * sin, pos.Y + TL2.X * sin + BR2.Y * cos);
             BR = new Vector2(pos.X + BR2.X * cos - BR2.Y * sin, pos.Y + BR2.X * sin + BR2.Y * cos);
-        }
-
-        private void CalculateRectangle(Vector2 pixelSize, Anchor pivot, out Vector2 TL, out Vector2 BR)
-        {
-            switch (pivot)
-            {
-                case Anchor.Left_Top:
-                    TL = new Vector2(  0,                0);
-                    BR = new Vector2(  pixelSize.X,      pixelSize.Y);
-                    return;
-                case Anchor.Center_Top:
-                    TL = new Vector2( -pixelSize.X / 2,  0);
-                    BR = new Vector2(  pixelSize.X / 2,  pixelSize.Y);
-                    return;
-                case Anchor.Right_Top:
-                    TL = new Vector2( -pixelSize.X,      0);
-                    BR = new Vector2(  0,                pixelSize.Y);
-                    return;
-
-                case Anchor.Left_Middle:
-                    TL = new Vector2(  0,               -pixelSize.Y / 2);
-                    BR = new Vector2(  pixelSize.X,      pixelSize.Y / 2);
-                    return;
-                case Anchor.Center_Middle:
-                    TL = new Vector2( -pixelSize.X / 2, -pixelSize.Y / 2);
-                    BR = new Vector2(  pixelSize.X / 2,  pixelSize.Y / 2);
-                    return;
-                case Anchor.Right_Middle:
-                    TL = new Vector2( -pixelSize.X,     -pixelSize.Y / 2);
-                    BR = new Vector2(  0,                pixelSize.Y / 2);
-                    return;
-
-                case Anchor.Left_Bottom:
-                    TL = new Vector2(  0,               -pixelSize.Y);
-                    BR = new Vector2(  pixelSize.X,      0);
-                    return;
-                case Anchor.Center_Bottom:
-                    TL = new Vector2( -pixelSize.X / 2, -pixelSize.Y);
-                    BR = new Vector2(  pixelSize.X / 2,  0);
-                    return;
-                case Anchor.Right_Bottom:
-                    TL = new Vector2( -pixelSize.X, -pixelSize.Y);
-                    BR = new Vector2(  0,           0);
-                    return;
-            }
-
-            throw new ArgumentOutOfRangeException();
+            */
         }
     }
 }

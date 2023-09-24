@@ -5,6 +5,7 @@ using RenderHierarchyLib.Models.Transform;
 using RenderHierarchyLib;
 using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Models.Enum;
+using RenderHierarchyLib.Extensions;
 
 namespace TestingDesktop
 {
@@ -16,7 +17,9 @@ namespace TestingDesktop
         private Camera _camera;
 
         private SpriteBatch _spriteBatch;
-        private TextureView2D _texture;
+        private TextureView2D _texture1;
+        private TextureView2D _texture2;
+        private TextureView2D _texture3;
 
         public Game1()
         {
@@ -37,7 +40,9 @@ namespace TestingDesktop
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _hierarchySpriteBatch = new HierarchyRenderBatch(GraphicsDevice, _camera);
-            _texture = new TextureView2D(Content.Load<Texture2D>("Test3"), Color.Red, Color.Red, Color.Green, Color.Blue);
+            _texture1 = new TextureView2D(Content.Load<Texture2D>("Test"));
+            _texture2 = new TextureView2D(Content.Load<Texture2D>("Test2"));
+            _texture3 = new TextureView2D(Content.Load<Texture2D>("Test3"));
 
             // TODO: use this.Content to load your game content here
         }
@@ -61,15 +66,21 @@ namespace TestingDesktop
             _hierarchySpriteBatch.Begin();
             //_hierarchySpriteBatch.Draw(_texture, new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One * 0.01f, SpriteEffects.None, 0);
             
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Left_Top, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Center_Top, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Right_Top, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Left_Middle, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Center_Middle, Rot = counter, Sca = new(2, 1) });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Right_Middle, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Left_Bottom, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Center_Bottom, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture, new RenderTransformObject() { Anchor = Anchor.Right_Bottom, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Left_Top, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Center_Top, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Right_Top, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Left_Middle, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Right_Middle, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Left_Bottom, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Center_Bottom, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Right_Bottom, Rot = counter });
+
+            var parent = new RenderObject() { Anchor = Anchor.Center_Middle, Pivot = Anchor.Center_Middle, Pos = new(0, 2), Rot = counter };
+            _hierarchySpriteBatch.Render(_texture2, parent);
+
+            var child = new RenderObject() { Anchor = Anchor.Right_Top, Pivot = Anchor.Center_Middle, Pos = new(0, 1.5f), Rot = 0 };
+            child.SetParentSelfTransform(parent);
+            _hierarchySpriteBatch.Render(_texture2, child);
 
             //_hierarchySpriteBatch.RenderTest(_texture.Texture, counter);
             _hierarchySpriteBatch.End();

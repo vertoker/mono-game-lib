@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
-using RenderHierarchyLib.Models.Transform.Interfaces;
 
 namespace RenderHierarchyLib.Models.Transform
 {
-    public struct TransformObject : ITransformObject
+    public struct TransformObject
     {
-        public Vector2 Pos { get; set; }
-        public float Rot { get; set; }
-        public Vector2 Sca { get; set; }
+        public Vector2 Pos;
+        public float Rot;
+        public Vector2 Sca;
 
         public TransformObject()
         {
