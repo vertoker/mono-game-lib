@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using RenderHierarchyLib.Models.Transform;
 using RenderHierarchyLib;
 using RenderHierarchyLib.Models;
-using RenderHierarchyLib.Models.Enum;
 using RenderHierarchyLib.Extensions;
 
 namespace TestingDesktop
@@ -61,36 +60,31 @@ namespace TestingDesktop
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 25;
+            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 300;
 
             _hierarchySpriteBatch.Begin();
-            //_hierarchySpriteBatch.Draw(_texture, new Vector2(10, 10), null, Color.White, 0, Vector2.Zero, Vector2.One * 0.01f, SpriteEffects.None, 0);
             
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Left_Top, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Center_Top, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Right_Top, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Left_Middle, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Right_Middle, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Left_Bottom, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Center_Bottom, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new RenderObject() { Anchor = Anchor.Right_Bottom, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.LeftTop, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.CenterTop, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.RightTop, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.LeftMiddle, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.RightMiddle, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.LeftBottom, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.CenterBottom, Rot = counter });
+            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.RightBottom, Rot = counter });
 
-            var parent = new RenderObject() { Anchor = Anchor.Center_Middle, Pivot = Anchor.Center_Middle, Pos = new(0, 2), Rot = counter };
+            var parent = new RenderObject() { Anchor = AnchorPresets.CenterMiddle, Pivot = AnchorPresets.LeftBottom, Pos = new(0, 0), Rot = counter, Sca = new(2, 2) };
             _hierarchySpriteBatch.Render(_texture2, parent);
 
-            var child = new RenderObject() { Anchor = Anchor.Right_Top, Pivot = Anchor.Center_Middle, Pos = new(0, 1.5f), Rot = 0 };
-            child.SetParentSelfTransform(parent);
-            _hierarchySpriteBatch.Render(_texture2, child);
+            var child = new RenderObject() { Anchor = AnchorPresets.CenterMiddle, Pivot = AnchorPresets.RightTop, Pos = new(0.5f, 0.5f), Rot = counter };
+            var child2 = child.SetParentNewTransform(parent);
+            _hierarchySpriteBatch.Render(_texture2, child2);
+            var child3 = child.SetParentNewTransform(child2);
+            _hierarchySpriteBatch.Render(_texture2, child3);
+            var child4 = child.SetParentNewTransform(child3);
+            _hierarchySpriteBatch.Render(_texture2, child4);
 
-            //_hierarchySpriteBatch.RenderTest(_texture.Texture, counter);
             _hierarchySpriteBatch.End();
-
-
-            /*
-            _spriteBatch.Begin();
-            _spriteBatch.Draw(_texture, new Vector2(20,20), Color.White);
-            _spriteBatch.End();
-            */
 
             base.Draw(gameTime);
         }

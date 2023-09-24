@@ -25,7 +25,7 @@ namespace RenderHierarchyLib.Extensions
             ref Vector2 parentPos, ref float parentRot, ref Vector2 parentSca,
             ref Vector2 outputPos, ref float outputRot, ref Vector2 outputSca)
         {
-            outputPos = MathExtensions.RotateVector(selfPos * parentSca, parentPos, parentRot);
+            outputPos = MathExtensions.RotateVector(selfPos * parentSca, parentPos, -parentRot);
             outputSca = selfSca * parentSca;
             outputRot = selfRot + parentRot;
         }

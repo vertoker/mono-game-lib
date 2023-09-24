@@ -1,11 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using RenderHierarchyLib.Models.Enum;
 using RenderHierarchyLib.Models.Transform;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RenderHierarchyLib.Extensions
 {
@@ -31,12 +25,12 @@ namespace RenderHierarchyLib.Extensions
                 ref self.Pos, ref self.Rot, ref self.Sca, ref self.Anchor, ref self.Pivot);
         }
 
-        public static void SetParent(ref Vector2 selfPos, ref float selfRot, ref Vector2 selfSca, ref Anchor selfAnchor, ref Anchor selfPivot,
-            ref Vector2 parentPos, ref float parentRot, ref Vector2 parentSca, ref Anchor parentAnchor, ref Anchor parentPivot,
-            ref Vector2 outputPos, ref float outputRot, ref Vector2 outputSca, ref Anchor outputAnchor, ref Anchor outputPivot)
+        public static void SetParent(ref Vector2 selfPos, ref float selfRot, ref Vector2 selfSca, ref Vector2 selfAnchor, ref Vector2 selfPivot,
+            ref Vector2 parentPos, ref float parentRot, ref Vector2 parentSca, ref Vector2 parentAnchor, ref Vector2 parentPivot,
+            ref Vector2 outputPos, ref float outputRot, ref Vector2 outputSca, ref Vector2 outputAnchor, ref Vector2 outputPivot)
         {
-            var offset = selfAnchor.GetCenterRectangle(Vector2.One) - parentPivot.GetCenterRectangle(Vector2.One);
-            outputPos = MathExtensions.RotateVector((selfPos + offset) * parentSca, parentPos, parentRot);
+            var offset = (selfAnchor - parentPivot) / 2f;
+            outputPos = MathExtensions.RotateVector((selfPos + offset) * parentSca, parentPos, -parentRot);
             outputSca = selfSca * parentSca;
             outputRot = selfRot + parentRot;
             outputPivot = selfPivot;
