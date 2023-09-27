@@ -28,3 +28,4 @@ E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\obj\Debug\net6.0\TestingD
 E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\obj\Debug\net6.0\ref\TestingDesktop.dll
 E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\bin\Debug\net6.0\Content\Test2.xnb
 E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\bin\Debug\net6.0\Content\Test3.xnb
+E:\Projects\Monogame\RenderHierarchyLib\TestingDesktop\bin\Debug\net6.0\Content\TextTest.xnb

@@ -16,6 +16,8 @@ namespace TestingDesktop
         private Camera _camera;
 
         private SpriteBatch _spriteBatch;
+
+        private SpriteFont _font1;
         private TextureView2D _texture1;
         private TextureView2D _texture2;
         private TextureView2D _texture3;
@@ -23,7 +25,7 @@ namespace TestingDesktop
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _camera = new Camera(new TransformCamera(10), _graphics);
+            _camera = new Camera(new TransformCamera(new(0, 0), 0, 10), _graphics);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -37,6 +39,7 @@ namespace TestingDesktop
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _hierarchySpriteBatch = new HierarchyRenderBatch(GraphicsDevice, _camera);
+            _font1 = Content.Load<SpriteFont>("TextTest");
             _texture1 = new TextureView2D(Content.Load<Texture2D>("Test"), new(0, 0.5f), new(1f, 1f));
             _texture2 = new TextureView2D(Content.Load<Texture2D>("Test2"));
             _texture3 = new TextureView2D(Content.Load<Texture2D>("Test3"));
@@ -58,34 +61,53 @@ namespace TestingDesktop
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 50;
+            _spriteBatch.Begin();
+
+            _spriteBatch.DrawString(_font1, "Test text", new(200, 200), Color.White);
+
+            _spriteBatch.End();
+
+            Render(gameTime);
+
+            base.Draw(gameTime);
+        }
+        private void Render(GameTime gameTime)
+        {
+            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 0;
+            var counter2 = (float)gameTime.TotalGameTime.TotalSeconds * 56;
 
             _hierarchySpriteBatch.Begin();
-            
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.LeftTop, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.CenterTop, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.RightTop, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.LeftMiddle, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.RightMiddle, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.LeftBottom, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.CenterBottom, Rot = counter });
-            _hierarchySpriteBatch.Render(_texture3, new() { Anchor = AnchorPresets.RightBottom, Rot = counter });
 
-            var parent = new RenderObject() { Anchor = AnchorPresets.CenterMiddle, Pivot = AnchorPresets.LeftTop, 
-                Pos = new(0, 0), Rot = counter, Sca = new(2f, 1f) };
-            _hierarchySpriteBatch.Render(_texture1, parent);
+            _hierarchySpriteBatch.CameraRender(_texture3, new() { Anchor = AnchorPresets.LeftTop, Rot = counter });
+            _hierarchySpriteBatch.WorldRender(_texture3, new() { Anchor = AnchorPresets.CenterTop, Rot = counter });
+            _hierarchySpriteBatch.CameraRender(_texture3, new() { Anchor = AnchorPresets.RightTop, Rot = counter });
+            _hierarchySpriteBatch.WorldRender(_texture3, new() { Anchor = AnchorPresets.LeftMiddle, Rot = counter });
+            _hierarchySpriteBatch.WorldRender(_texture3, new() { Anchor = AnchorPresets.RightMiddle, Rot = counter });
+            _hierarchySpriteBatch.CameraRender(_texture3, new() { Anchor = AnchorPresets.LeftBottom, Rot = counter });
+            _hierarchySpriteBatch.WorldRender(_texture3, new() { Anchor = AnchorPresets.CenterBottom, Rot = counter });
+            _hierarchySpriteBatch.CameraRender(_texture3, new() { Anchor = AnchorPresets.RightBottom, Rot = counter });
+
+            var parent = new RenderObject()
+            {
+                Anchor = AnchorPresets.CenterMiddle,
+                Pivot = AnchorPresets.CenterMiddle,
+                Pos = new(0, 0),
+                Rot = counter,
+                Sca = new(1f, 1f)
+            };
+            _hierarchySpriteBatch.WorldRender(_texture2, parent);
+
+            _camera.Transform.Rot = counter2;
 
             var child = new RenderObject() { Anchor = AnchorPresets.CenterMiddle, Pivot = AnchorPresets.RightTop, Pos = new(0.5f, 0.5f), Rot = counter };
             var child2 = child.SetParentNewTransform(parent);
-            _hierarchySpriteBatch.Render(_texture1, child2);
+            _hierarchySpriteBatch.WorldRender(_texture1, child2);
             var child3 = child.SetParentNewTransform(child2);
-            _hierarchySpriteBatch.Render(_texture1, child3);
+            _hierarchySpriteBatch.WorldRender(_texture1, child3);
             var child4 = child.SetParentNewTransform(child3);
-            _hierarchySpriteBatch.Render(_texture1, child4);
+            _hierarchySpriteBatch.WorldRender(_texture1, child4);
 
             _hierarchySpriteBatch.End();
-
-            base.Draw(gameTime);
         }
     }
 }
