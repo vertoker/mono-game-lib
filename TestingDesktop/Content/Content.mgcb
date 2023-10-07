@@ -49,6 +49,9 @@
 /processorParam:TextureFormat=Color
 /build:17_TriangleBoldOutline.png;Test3.png
 
+#begin Roboto-Black.ttf
+/copy:Roboto-Black.ttf
+
 #begin TextTest.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

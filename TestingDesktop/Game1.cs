@@ -63,7 +63,7 @@ namespace TestingDesktop
 
             _spriteBatch.Begin();
 
-            _spriteBatch.DrawString(_font1, "Test text", new(200, 200), Color.White);
+            _spriteBatch.DrawString(_font1, "Test \n textfghfhfhghfgh", new(200, 200), Color.White);
 
             _spriteBatch.End();
 
