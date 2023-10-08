@@ -27,5 +27,7 @@ namespace RenderHierarchyLib.Models.Transform
             Rot = rot;
             Sca = sca;
         }
+
+        public static readonly TransformObject Empty = new();
     }
 }

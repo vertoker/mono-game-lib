@@ -31,5 +31,7 @@ namespace RenderHierarchyLib.Models.Transform
             Rot = rot;
             PixelSca = pixelSca;
         }
+
+        public static readonly TransformCamera Empty = new();
     }
 }

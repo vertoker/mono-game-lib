@@ -1,9 +1,8 @@
 ﻿using RenderHierarchyLib;
-using RenderHierarchyLib.Core;
 using RenderHierarchyLib.Extensions;
-using RenderHierarchyLib.Graphics;
 using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Models.Transform;
+using RenderHierarchyLib.Render.Sprite;
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -79,7 +78,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public HierarchySpriteBatchItem CreateBatchItem() => _batcher.CreateBatchItem();
 
-        public void RenderTest(Texture2D texture, float angle = 15)
+        public void RenderTest(Texture2D texture, float angle = 0)
         {
             CheckValid(texture);
             var spriteBatchItem = CreateBatchItem();
@@ -107,6 +106,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var mark4 = new Vector2(1, 1);
 
             var baseVector = new Vector3(200, 200, 0);
+
+            // 1 2 3 4 - (1, 1)
+            // 2 1 4 3 - (-1, 1)
+            // 3 4 1 2 - (1, -1)
+            // 4 3 2 1 - (-1, -1)
 
             spriteBatchItem.vertexTL = new VertexPositionColorTexture(baseVector + scale1 * vector, Color.White, mark1 * vector2);
             spriteBatchItem.vertexTR = new VertexPositionColorTexture(baseVector + scale2 * vector, Color.White, mark2 * vector2);
@@ -269,6 +273,9 @@ namespace Microsoft.Xna.Framework.Graphics
             CalculateWorldRectangle(_camera.GetAnchorPosWorld(anchor), pos * _posPixelScale, rot, sca * _pixelScale, pivot,
                 out var TL, out var TR, out var BL, out var BR);
 
+            if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
+            if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
+
             spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), colorTL, viewStart);
             spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), colorTR, new Vector2(viewEnd.X, viewStart.Y));
             spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), colorBL, new Vector2(viewStart.X, viewEnd.Y));
@@ -285,6 +292,9 @@ namespace Microsoft.Xna.Framework.Graphics
             CalculateCameraRectangle(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot, sca * _pixelScale, pivot, 
                 out var TL, out var TR, out var BL, out var BR);
 
+            if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
+            if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
+
             spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), colorTL, viewStart);
             spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), colorTR, new Vector2(viewEnd.X, viewStart.Y));
             spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), colorBL, new Vector2(viewStart.X, viewEnd.Y));
@@ -300,6 +310,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             pixelSize.GetBordersRectangleByPivot(pivot, out var TL2, out var BR2);
 
+            if (pixelSize.X < 0) (TL2.X, BR2.X) = (BR2.X, TL2.X);
+            if (pixelSize.Y < 0) (TL2.Y, BR2.Y) = (BR2.Y, TL2.Y);
+
             pos = parentPos + pos.RotateVector(sin, cos);
             TL = MathExtensions.RotateVector(TL2.X, TL2.Y, pos, sin, cos);
             TR = MathExtensions.RotateVector(BR2.X, TL2.Y, pos, sin, cos);
@@ -313,6 +326,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
 
             pixelSize.GetBordersRectangleByPivot(pivot, out var TL2, out var BR2);
+
+            if (pixelSize.X < 0) (TL2.X, BR2.X) = (BR2.X, TL2.X);
+            if (pixelSize.Y < 0) (TL2.Y, BR2.Y) = (BR2.Y, TL2.Y);
 
             pos = parentPos + pos;
             TL = MathExtensions.RotateVector(TL2.X, TL2.Y, pos, sin, cos);

@@ -3,7 +3,7 @@
   <SourceFile>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/01_Square.png</SourceFile>
   <SourceTime>2023-09-14T22:47:19.3122182+05:00</SourceTime>
   <DestFile>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/bin/DesktopGL/Content/Test2.xnb</DestFile>
-  <DestTime>2023-09-21T21:02:57.7138687+05:00</DestTime>
+  <DestTime>2023-10-08T13:26:26.8865672+05:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2022-07-26T16:44:56+05:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
@@ -34,7 +34,7 @@
   </Parameters>
   <Parameters>
     <Key>TextureFormat</Key>
-    <Value>Color</Value>
+    <Value>DxtCompressed</Value>
   </Parameters>
   <Dependencies />
   <BuildAsset />

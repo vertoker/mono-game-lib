@@ -3,7 +3,7 @@
   <SourceFile>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/17_TriangleBoldOutline.png</SourceFile>
   <SourceTime>2023-09-14T22:50:06.416853+05:00</SourceTime>
   <DestFile>E:/Projects/Monogame/RenderHierarchyLib/TestingDesktop/Content/bin/DesktopGL/Content/Test3.xnb</DestFile>
-  <DestTime>2023-09-21T21:30:52.5253437+05:00</DestTime>
+  <DestTime>2023-10-08T13:26:27.7481153+05:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2022-07-26T16:44:56+05:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
@@ -34,7 +34,7 @@
   </Parameters>
   <Parameters>
     <Key>TextureFormat</Key>
-    <Value>Color</Value>
+    <Value>DxtCompressed</Value>
   </Parameters>
   <Dependencies />
   <BuildAsset />

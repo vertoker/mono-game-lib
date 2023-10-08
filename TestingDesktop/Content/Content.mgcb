@@ -22,7 +22,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
+/processorParam:TextureFormat=DxtCompressed
 /build:01_Square.png;Test2.png
 
 #begin 04_Circle.png
@@ -34,8 +34,8 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:04_Circle.png;Test.png
+/processorParam:TextureFormat=DxtCompressed
+/build:04_Circle.png;Test1.png
 
 #begin 17_TriangleBoldOutline.png
 /importer:TextureImporter
@@ -46,8 +46,32 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
+/processorParam:TextureFormat=DxtCompressed
 /build:17_TriangleBoldOutline.png;Test3.png
+
+#begin 28_Arrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:28_Arrow.png;Test4.png
+
+#begin BulletHero_Logo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BulletHero_Logo.png;Test0.png
 
 #begin Roboto-Black.ttf
 /copy:Roboto-Black.ttf
