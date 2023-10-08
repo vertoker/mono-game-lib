@@ -5,6 +5,7 @@ using RenderHierarchyLib.Models.Transform;
 using RenderHierarchyLib;
 using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Extensions;
+using RenderHierarchyLib.Models.Text;
 
 namespace TestingDesktop
 {
@@ -37,7 +38,8 @@ namespace TestingDesktop
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _hierarchySpriteBatch = new HierarchyRenderBatch(GraphicsDevice, _camera);
-            _font1 = new FontView2D(Content.Load<SpriteFont>("TextTest"));
+            var font = Content.Load<SpriteFont>("TextTest");
+            _font1 = new FontView2D(font);
             _textures = new TextureView2D[]
             {
                 new TextureView2D(Content.Load<Texture2D>("Test0")),
@@ -46,8 +48,6 @@ namespace TestingDesktop
                 new TextureView2D(Content.Load<Texture2D>("Test3")),
                 new TextureView2D(Content.Load<Texture2D>("Test4"))
             };
-
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -75,11 +75,16 @@ namespace TestingDesktop
             var counter = (float)gameTime.TotalGameTime.TotalSeconds * 25;
 
             _spriteBatch.Begin();
-
+            _spriteBatch.Draw(_font1.Font.Texture, new Vector2(200, 0), Color.White);
+            /*
             _spriteBatch.DrawString(_font1.Font, "Test \n textfghfhfhghfgh", new Vector2(200, 200), Color.White,
                 counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
-
+            */
             _spriteBatch.End();
+
+            _hierarchySpriteBatch.Begin();
+            _hierarchySpriteBatch.RenderTextTest(_font1.Font, "Test text");
+            _hierarchySpriteBatch.End();
         }
 
         private void Render(GameTime gameTime)
@@ -106,7 +111,7 @@ namespace TestingDesktop
                 Rot = counter,
                 Sca = new(2f, 2f)
             };
-            _hierarchySpriteBatch.WorldRender(_textures[0], parent);
+            //_hierarchySpriteBatch.WorldRender(_textures[0], parent);
 
             //_hierarchySpriteBatch.RenderTest(_textures[0].Texture);
 
@@ -114,11 +119,11 @@ namespace TestingDesktop
 
             var child = new RenderObject() { Anchor = AnchorPresets.CenterMiddle, Pivot = AnchorPresets.RightTop, Pos = new(0.5f, 0.5f), Rot = counter };
             var child2 = child.SetParentNewTransform(parent);
-            _hierarchySpriteBatch.WorldRender(_textures[1], child2);
+            //_hierarchySpriteBatch.WorldRender(_textures[1], child2);
             var child3 = child.SetParentNewTransform(child2);
-            _hierarchySpriteBatch.WorldRender(_textures[1], child3);
+            //_hierarchySpriteBatch.WorldRender(_textures[1], child3);
             var child4 = child.SetParentNewTransform(child3);
-            _hierarchySpriteBatch.WorldRender(_textures[1], child4);
+            //_hierarchySpriteBatch.WorldRender(_textures[1], child4);
 
             _hierarchySpriteBatch.End();
         }

@@ -4,6 +4,9 @@ using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Models.Transform;
 using RenderHierarchyLib.Render.Sprite;
 using System;
+using static System.Formats.Asn1.AsnWriter;
+using System.Drawing;
+using RenderHierarchyLib.Models.Text;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -75,8 +78,32 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_beginCalled)
                 throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
         }
+        private void CheckValid(CustomSpriteFont spriteFont, string text)
+        {
+            if (spriteFont == null)
+            {
+                throw new ArgumentNullException("spriteFont");
+            }
+
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
+            if (!_beginCalled)
+            {
+                throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
+            }
+        }
 
         public HierarchySpriteBatchItem CreateBatchItem() => _batcher.CreateBatchItem();
+
+        #region Tests
+        public void RenderTextTest(CustomSpriteFont font, string text)
+        {
+            CheckValid(font, text);
+            RenderTest(font.Texture);
+        }
 
         public void RenderTest(Texture2D texture, float angle = 0)
         {
@@ -118,6 +145,135 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.vertexBR = new VertexPositionColorTexture(baseVector + scale4 * vector, Color.White, mark4 * vector2);
             //spriteBatchItem.Set(25, 0, 150, 200, Color.White, Vector2.Zero, Vector2.One, 0);
         }
+        #endregion
+
+
+        public unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+        {
+            CheckValid(spriteFont, text);
+            float sortKey = 0f;
+
+            Vector2 zero = Vector2.Zero;
+            bool flag = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
+            bool flag2 = (effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
+            if (flag || flag2)
+            {
+                spriteFont.MeasureString(ref text, out var size);
+                if (flag2)
+                {
+                    origin.X *= -1f;
+                    zero.X = 0f - size.X;
+                }
+
+                if (flag)
+                {
+                    origin.Y *= -1f;
+                    zero.Y = (float)spriteFont.LineSpacing - size.Y;
+                }
+            }
+
+            Matrix matrix = Matrix.Identity;
+            float num = 0f;
+            float num2 = 0f;
+            if (rotation == 0f)
+            {
+                matrix.M11 = (flag2 ? (0f - scale.X) : scale.X);
+                matrix.M22 = (flag ? (0f - scale.Y) : scale.Y);
+                matrix.M41 = (zero.X - origin.X) * matrix.M11 + position.X;
+                matrix.M42 = (zero.Y - origin.Y) * matrix.M22 + position.Y;
+            }
+            else
+            {
+                num = MathF.Cos(rotation);
+                num2 = MathF.Sin(rotation);
+                matrix.M11 = (flag2 ? (0f - scale.X) : scale.X) * num;
+                matrix.M12 = (flag2 ? (0f - scale.X) : scale.X) * num2;
+                matrix.M21 = (flag ? (0f - scale.Y) : scale.Y) * (0f - num2);
+                matrix.M22 = (flag ? (0f - scale.Y) : scale.Y) * num;
+                matrix.M41 = (zero.X - origin.X) * matrix.M11 + (zero.Y - origin.Y) * matrix.M21 + position.X;
+                matrix.M42 = (zero.X - origin.X) * matrix.M12 + (zero.Y - origin.Y) * matrix.M22 + position.Y;
+            }
+
+            /*Vector2 zero2 = Vector2.Zero;
+            bool flag3 = true;
+            fixed (SpriteFont.Glyph* ptr = spriteFont.Glyphs)
+            {
+                foreach (char c in text)
+                {
+                    switch (c)
+                    {
+                        case '\n':
+                            zero2.X = 0f;
+                            zero2.Y += spriteFont.LineSpacing;
+                            flag3 = true;
+                            continue;
+                        case '\r':
+                            continue;
+                    }
+
+                    int glyphIndexOrDefault = spriteFont.GetGlyphIndexOrDefault(c);
+                    SpriteFont.Glyph* ptr2 = ptr + glyphIndexOrDefault;
+                    if (flag3)
+                    {
+                        zero2.X = Math.Max(ptr2->LeftSideBearing, 0f);
+                        flag3 = false;
+                    }
+                    else
+                    {
+                        zero2.X += spriteFont.Spacing + ptr2->LeftSideBearing;
+                    }
+
+                    Vector2 position2 = zero2;
+                    if (flag2)
+                    {
+                        position2.X += ptr2->BoundsInTexture.Width;
+                    }
+
+                    position2.X += ptr2->Cropping.X;
+                    if (flag)
+                    {
+                        position2.Y += ptr2->BoundsInTexture.Height - spriteFont.LineSpacing;
+                    }
+
+                    position2.Y += ptr2->Cropping.Y;
+                    Vector2.Transform(ref position2, ref matrix, out position2);
+                    var spriteBatchItem = CreateBatchItem();
+                    spriteBatchItem.Texture = spriteFont.Texture;
+                    spriteBatchItem.SortKey = sortKey;
+                    _texCoordTL.X = (float)ptr2->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
+                    _texCoordTL.Y = (float)ptr2->BoundsInTexture.Y * spriteFont.Texture.TexelHeight;
+                    _texCoordBR.X = (float)(ptr2->BoundsInTexture.X + ptr2->BoundsInTexture.Width) * spriteFont.Texture.TexelWidth;
+                    _texCoordBR.Y = (float)(ptr2->BoundsInTexture.Y + ptr2->BoundsInTexture.Height) * spriteFont.Texture.TexelHeight;
+                    if ((effects & SpriteEffects.FlipVertically) != 0)
+                    {
+                        float y = _texCoordBR.Y;
+                        _texCoordBR.Y = _texCoordTL.Y;
+                        _texCoordTL.Y = y;
+                    }
+
+                    if ((effects & SpriteEffects.FlipHorizontally) != 0)
+                    {
+                        float x = _texCoordBR.X;
+                        _texCoordBR.X = _texCoordTL.X;
+                        _texCoordTL.X = x;
+                    }
+
+                    if (rotation == 0f)
+                    {
+                        spriteBatchItem.Set(position2.X, position2.Y, (float)ptr2->BoundsInTexture.Width * scale.X, (float)ptr2->BoundsInTexture.Height * scale.Y, color, _texCoordTL, _texCoordBR, layerDepth);
+                    }
+                    else
+                    {
+                        spriteBatchItem.Set(position2.X, position2.Y, 0f, 0f, (float)ptr2->BoundsInTexture.Width * scale.X, (float)ptr2->BoundsInTexture.Height * scale.Y, num2, num, color, _texCoordTL, _texCoordBR, layerDepth);
+                    }
+
+                    zero2.X += ptr2->Width + ptr2->RightSideBearing;
+                }
+            }
+
+            FlushIfNeeded();*/
+        }
+
 
         #region World Render Methods
         public void WorldRender(TextureView2D view, RenderObject transform) =>
