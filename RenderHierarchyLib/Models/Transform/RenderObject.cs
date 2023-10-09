@@ -61,6 +61,7 @@ namespace RenderHierarchyLib.Models.Transform
         }
 
         public static readonly RenderObject Empty = new();
+
         public static readonly RenderObject LeftTop = new() { Anchor = AnchorPresets.LeftTop };
         public static readonly RenderObject CenterTop = new() { Anchor = AnchorPresets.CenterTop };
         public static readonly RenderObject RightTop = new() { Anchor = AnchorPresets.RightTop };

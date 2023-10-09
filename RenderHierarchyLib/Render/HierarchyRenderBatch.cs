@@ -7,6 +7,9 @@ using System;
 using static System.Formats.Asn1.AsnWriter;
 using System.Drawing;
 using RenderHierarchyLib.Models.Text;
+using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -197,6 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
             bool flag3 = true;
             fixed (SpriteFont.Glyph* ptr = spriteFont.Glyphs)
             {
+                EditAndContinueLogEntry;
                 foreach (char c in text)
                 {
                     switch (c)
@@ -211,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 
                     int glyphIndexOrDefault = spriteFont.GetGlyphIndexOrDefault(c);
-                    SpriteFont.Glyph* ptr2 = ptr + glyphIndexOrDefault;
+                    var ptr2 = ptr + glyphIndexOrDefault;
                     if (flag3)
                     {
                         zero2.X = Math.Max(ptr2->LeftSideBearing, 0f);
@@ -272,21 +276,21 @@ namespace Microsoft.Xna.Framework.Graphics
             */
         }
 
-        public unsafe void CameraTextRender(CustomSpriteFont font, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth)
+        public unsafe void CameraTextRender(CustomSpriteFont font, string text, Color defaultColor, List<TextColorIndexes> colors,
+            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
-
+            font.MeasureString(ref text, out var size);
         }
 
 
         #region World Render Methods
-        public void WorldRender(TextureView2D view, RenderObject transform) =>
+        public void WorldRender(TextureView view, RenderObject transform) =>
             WorldRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void WorldRender(TextureView2D view, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
+        public void WorldRender(TextureView view, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
             WorldRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void WorldRender(TextureView2D view, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
+        public void WorldRender(TextureView view, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
             WorldRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 pos, rot, sca, anchor, pivot, depth);
 
@@ -320,13 +324,13 @@ namespace Microsoft.Xna.Framework.Graphics
         #endregion
 
         #region Camera Render Methods
-        public void CameraRender(TextureView2D view, RenderObject transform) =>
+        public void CameraRender(TextureView view, RenderObject transform) =>
             CameraRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void CameraRender(TextureView2D view, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
+        public void CameraRender(TextureView view, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
             CameraRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void CameraRender(TextureView2D view, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
+        public void CameraRender(TextureView view, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
             CameraRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 pos, rot, sca, anchor, pivot, depth);
 

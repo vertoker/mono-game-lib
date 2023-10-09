@@ -18,8 +18,8 @@ namespace TestingDesktop
 
         private SpriteBatch _spriteBatch;
 
-        private FontView2D _font1;
-        private TextureView2D[] _textures;
+        private TextView _font1;
+        private TextureView[] _textures;
 
         public Game1()
         {
@@ -39,14 +39,14 @@ namespace TestingDesktop
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _hierarchySpriteBatch = new HierarchyRenderBatch(GraphicsDevice, _camera);
             var font = Content.Load<SpriteFont>("TextTest");
-            _font1 = new FontView2D(font);
-            _textures = new TextureView2D[]
+            _font1 = new TextView("Test text", font);
+            _textures = new TextureView[]
             {
-                new TextureView2D(Content.Load<Texture2D>("Test0")),
-                new TextureView2D(Content.Load<Texture2D>("Test1"), new Vector2(0, 0.5f), new Vector2(1, 1)),
-                new TextureView2D(Content.Load<Texture2D>("Test2")),
-                new TextureView2D(Content.Load<Texture2D>("Test3")),
-                new TextureView2D(Content.Load<Texture2D>("Test4"))
+                new TextureView(Content.Load<Texture2D>("Test0")),
+                new TextureView(Content.Load<Texture2D>("Test1"), new Vector2(0, 0.5f), new Vector2(1, 1)),
+                new TextureView(Content.Load<Texture2D>("Test2")),
+                new TextureView(Content.Load<Texture2D>("Test3")),
+                new TextureView(Content.Load<Texture2D>("Test4"))
             };
         }
 
