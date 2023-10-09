@@ -43,7 +43,7 @@ namespace TestingDesktop
             _textures = new TextureView2D[]
             {
                 new TextureView2D(Content.Load<Texture2D>("Test0")),
-                new TextureView2D(Content.Load<Texture2D>("Test1"), new(0, 0.5f), new(1f, 1f)),
+                new TextureView2D(Content.Load<Texture2D>("Test1"), new Vector2(0, 0.5f), new Vector2(1, 1)),
                 new TextureView2D(Content.Load<Texture2D>("Test2")),
                 new TextureView2D(Content.Load<Texture2D>("Test3")),
                 new TextureView2D(Content.Load<Texture2D>("Test4"))

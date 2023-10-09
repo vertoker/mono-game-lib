@@ -281,149 +281,85 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region World Render Methods
         public void WorldRender(TextureView2D view, RenderObject transform) =>
-            WorldRender(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
+            WorldRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
         public void WorldRender(TextureView2D view, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
+            WorldRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
         public void WorldRender(TextureView2D view, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
+            WorldRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 pos, rot, sca, anchor, pivot, depth);
 
         public void WorldRender(Texture2D texture, Rectangle rectangle, Color color,
             RenderObject transform) =>
-            WorldRender(texture,
+            WorldRender(texture, color,
                 new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
                 new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                color, color, color, color, transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void WorldRender(Texture2D texture, Rectangle rectangle, Color color,
-            TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                color, color, color, color, transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void WorldRender(Texture2D texture, Rectangle rectangle, Color color,
-            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                color, color, color, color, pos, rot, sca, anchor, pivot, depth);
-
-        public void WorldRender(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            RenderObject transform) =>
-            WorldRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                colorTL, colorTR, colorBL, colorBR, transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void WorldRender(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                colorTL, colorTR, colorBL, colorBR, transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void WorldRender(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                colorTL, colorTR, colorBL, colorBR, pos, rot, sca, anchor, pivot, depth);
-
-        public void WorldRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
-            RenderObject transform) =>
-            WorldRender(texture, viewStart, viewEnd, color, color, color, color,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void WorldRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
+        public void WorldRender(Texture2D texture, Rectangle rectangle, Color color,
             TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture, viewStart, viewEnd, color, color, color, color,
+            WorldRender(texture, color,
+                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
+                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void WorldRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
+        public void WorldRender(Texture2D texture, Rectangle rectangle, Color color,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture, viewStart, viewEnd, color, color, color, color,
+            WorldRender(texture, color,
+                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
+                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
                 pos, rot, sca, anchor, pivot, depth);
 
-        public void WorldRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+        public void WorldRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             RenderObject transform) =>
-            WorldRender(texture, viewStart, viewEnd, colorTL, colorTR, colorBL, colorBR,
+            WorldRender(texture, color, viewStart, viewEnd,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void WorldRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+        public void WorldRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            WorldRender(texture, viewStart, viewEnd, colorTL, colorTR, colorBL, colorBR,
+            WorldRender(texture, color, viewStart, viewEnd,
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
         #endregion
 
         #region Camera Render Methods
         public void CameraRender(TextureView2D view, RenderObject transform) =>
-            CameraRender(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
+            CameraRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
         public void CameraRender(TextureView2D view, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
+            CameraRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
         public void CameraRender(TextureView2D view, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(view.Texture, view.ViewStart, view.ViewEnd, view.ColorTL, view.ColorTR, view.ColorBL, view.ColorBR,
+            CameraRender(view.Texture, view.Color, view.ViewStart, view.ViewEnd,
                 pos, rot, sca, anchor, pivot, depth);
 
-        public void CameraRender(Texture2D texture, Rectangle rectangle, Color color,
+        public void CameraRender(Texture2D texture, Color color, Rectangle rectangle,
             RenderObject transform) =>
-            CameraRender(texture,
+            CameraRender(texture, color,
                 new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
                 new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                color, color, color, color, transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void CameraRender(Texture2D texture, Rectangle rectangle, Color color,
-            TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                color, color, color, color, transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void CameraRender(Texture2D texture, Rectangle rectangle, Color color,
-            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                color, color, color, color, pos, rot, sca, anchor, pivot, depth);
-
-        public void CameraRender(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            RenderObject transform) =>
-            CameraRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                colorTL, colorTR, colorBL, colorBR, transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void CameraRender(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                colorTL, colorTR, colorBL, colorBR, transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void CameraRender(Texture2D texture, Rectangle rectangle, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
-            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture,
-                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
-                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
-                colorTL, colorTR, colorBL, colorBR, pos, rot, sca, anchor, pivot, depth);
-
-        public void CameraRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
-            RenderObject transform) =>
-            CameraRender(texture, viewStart, viewEnd, color, color, color, color,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void CameraRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
+        public void CameraRender(Texture2D texture, Color color, Rectangle rectangle,
             TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture, viewStart, viewEnd, color, color, color, color,
+            CameraRender(texture, color,
+                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
+                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
-        public void CameraRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color color,
+        public void CameraRender(Texture2D texture, Color color, Rectangle rectangle,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture, viewStart, viewEnd, color, color, color, color,
+            CameraRender(texture, color,
+                new Vector2(rectangle.Left / texture.Width, rectangle.Top / texture.Width),
+                new Vector2(rectangle.Right / texture.Width, rectangle.Bottom / texture.Width),
                 pos, rot, sca, anchor, pivot, depth);
 
-        public void CameraRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+        public void CameraRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             RenderObject transform) =>
-            CameraRender(texture, viewStart, viewEnd, colorTL, colorTR, colorBL, colorBR,
+            CameraRender(texture, color, viewStart, viewEnd,
                 transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
-        public void CameraRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+        public void CameraRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
-            CameraRender(texture, viewStart, viewEnd, colorTL, colorTR, colorBL, colorBR,
+            CameraRender(texture, color, viewStart, viewEnd,
                 transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
         #endregion
 
-        public void WorldRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+        public void WorldRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth)
         {
             var spriteBatchItem = CreateBatchItem();
@@ -436,13 +372,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
             if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
 
-            spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), colorTL, viewStart);
-            spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), colorTR, new Vector2(viewEnd.X, viewStart.Y));
-            spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), colorBL, new Vector2(viewStart.X, viewEnd.Y));
-            spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), colorBR, viewEnd);
+            spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), color, viewStart);
+            spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
+            spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
+            spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
         }
 
-        public void CameraRender(Texture2D texture, Vector2 viewStart, Vector2 viewEnd, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+        public void CameraRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth)
         {
             var spriteBatchItem = CreateBatchItem();
@@ -455,10 +391,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
             if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
 
-            spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), colorTL, viewStart);
-            spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), colorTR, new Vector2(viewEnd.X, viewStart.Y));
-            spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), colorBL, new Vector2(viewStart.X, viewEnd.Y));
-            spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), colorBR, viewEnd);
+            spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), color, viewStart);
+            spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
+            spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
+            spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
         }
 
         private static void CalculateRectangle(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot, 
