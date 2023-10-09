@@ -151,21 +151,20 @@ namespace Microsoft.Xna.Framework.Graphics
         public unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
             CheckValid(spriteFont, text);
-            float sortKey = 0f;
 
             Vector2 zero = Vector2.Zero;
-            bool flag = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            bool flag2 = (effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-            if (flag || flag2)
+            bool flagVertical = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
+            bool flagHorizontal = (effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
+            if (flagVertical || flagHorizontal)
             {
                 spriteFont.MeasureString(ref text, out var size);
-                if (flag2)
+                if (flagHorizontal)
                 {
                     origin.X *= -1f;
                     zero.X = 0f - size.X;
                 }
 
-                if (flag)
+                if (flagVertical)
                 {
                     origin.Y *= -1f;
                     zero.Y = (float)spriteFont.LineSpacing - size.Y;
@@ -173,28 +172,28 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Matrix matrix = Matrix.Identity;
-            float num = 0f;
-            float num2 = 0f;
+            float sin = 0f;
+            float cos = 0f;
             if (rotation == 0f)
             {
-                matrix.M11 = (flag2 ? (0f - scale.X) : scale.X);
-                matrix.M22 = (flag ? (0f - scale.Y) : scale.Y);
+                matrix.M11 = (flagHorizontal ? (0f - scale.X) : scale.X);
+                matrix.M22 = (flagVertical ? (0f - scale.Y) : scale.Y);
                 matrix.M41 = (zero.X - origin.X) * matrix.M11 + position.X;
                 matrix.M42 = (zero.Y - origin.Y) * matrix.M22 + position.Y;
             }
             else
             {
-                num = MathF.Cos(rotation);
-                num2 = MathF.Sin(rotation);
-                matrix.M11 = (flag2 ? (0f - scale.X) : scale.X) * num;
-                matrix.M12 = (flag2 ? (0f - scale.X) : scale.X) * num2;
-                matrix.M21 = (flag ? (0f - scale.Y) : scale.Y) * (0f - num2);
-                matrix.M22 = (flag ? (0f - scale.Y) : scale.Y) * num;
+                sin = MathF.Cos(rotation);
+                cos = MathF.Sin(rotation);
+                matrix.M11 = (flagHorizontal ? (0f - scale.X) : scale.X) * sin;
+                matrix.M12 = (flagHorizontal ? (0f - scale.X) : scale.X) * cos;
+                matrix.M21 = (flagVertical ? (0f - scale.Y) : scale.Y) * (0f - cos);
+                matrix.M22 = (flagVertical ? (0f - scale.Y) : scale.Y) * sin;
                 matrix.M41 = (zero.X - origin.X) * matrix.M11 + (zero.Y - origin.Y) * matrix.M21 + position.X;
                 matrix.M42 = (zero.X - origin.X) * matrix.M12 + (zero.Y - origin.Y) * matrix.M22 + position.Y;
             }
-
-            /*Vector2 zero2 = Vector2.Zero;
+            /*
+            Vector2 zero2 = Vector2.Zero;
             bool flag3 = true;
             fixed (SpriteFont.Glyph* ptr = spriteFont.Glyphs)
             {
@@ -224,13 +223,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 
                     Vector2 position2 = zero2;
-                    if (flag2)
+                    if (flagHorizontal)
                     {
                         position2.X += ptr2->BoundsInTexture.Width;
                     }
 
                     position2.X += ptr2->Cropping.X;
-                    if (flag)
+                    if (flagVertical)
                     {
                         position2.Y += ptr2->BoundsInTexture.Height - spriteFont.LineSpacing;
                     }
@@ -264,14 +263,19 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        spriteBatchItem.Set(position2.X, position2.Y, 0f, 0f, (float)ptr2->BoundsInTexture.Width * scale.X, (float)ptr2->BoundsInTexture.Height * scale.Y, num2, num, color, _texCoordTL, _texCoordBR, layerDepth);
+                        spriteBatchItem.Set(position2.X, position2.Y, 0f, 0f, (float)ptr2->BoundsInTexture.Width * scale.X, (float)ptr2->BoundsInTexture.Height * scale.Y, cos, sin, color, _texCoordTL, _texCoordBR, layerDepth);
                     }
 
                     zero2.X += ptr2->Width + ptr2->RightSideBearing;
                 }
             }
+            */
+        }
 
-            FlushIfNeeded();*/
+        public unsafe void CameraTextRender(CustomSpriteFont font, Color colorTL, Color colorTR, Color colorBL, Color colorBR,
+            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth)
+        {
+
         }
 
 
@@ -426,8 +430,8 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateWorldRectangle(_camera.GetAnchorPosWorld(anchor), pos * _posPixelScale, rot, sca * _pixelScale, pivot,
-                out var TL, out var TR, out var BL, out var BR);
+            CalculateRectangle(_camera.GetAnchorPosWorld(anchor), pos * _posPixelScale, rot + _camera.Transform.Rot,
+                sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
             if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
@@ -445,8 +449,8 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateCameraRectangle(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot, sca * _pixelScale, pivot, 
-                out var TL, out var TR, out var BL, out var BR);
+            CalculateRectangle(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot,
+                sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
             if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
@@ -457,40 +461,29 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), colorBR, viewEnd);
         }
 
-        private void CalculateWorldRectangle(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
+        private static void CalculateRectangle(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot, 
             out Vector2 TL, out Vector2 TR, out Vector2 BL, out Vector2 BR)
         {
-            rot += _camera.Transform.Rot;
+            pixelSize.GetBordersRectangleByPivot(pivot, out TL, out BR);
+
+            if (pixelSize.X < 0) (TL.X, BR.X) = (BR.X, TL.X);
+            if (pixelSize.Y < 0) (TL.Y, BR.Y) = (BR.Y, TL.Y);
+
+            if (rot == 0)
+            {
+                TR.X = BR.X; TR.Y = TL.Y;
+                BL.X = TL.X; BL.Y = BR.Y;
+                return;
+            }
+
             var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
             var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
-
-            pixelSize.GetBordersRectangleByPivot(pivot, out var TL2, out var BR2);
-
-            if (pixelSize.X < 0) (TL2.X, BR2.X) = (BR2.X, TL2.X);
-            if (pixelSize.Y < 0) (TL2.Y, BR2.Y) = (BR2.Y, TL2.Y);
-
-            pos = parentPos + pos.RotateVector(sin, cos);
-            TL = MathExtensions.RotateVector(TL2.X, TL2.Y, pos, sin, cos);
-            TR = MathExtensions.RotateVector(BR2.X, TL2.Y, pos, sin, cos);
-            BL = MathExtensions.RotateVector(TL2.X, BR2.Y, pos, sin, cos);
-            BR = MathExtensions.RotateVector(BR2.X, BR2.Y, pos, sin, cos);
-        }
-        private void CalculateCameraRectangle(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot, 
-            out Vector2 TL, out Vector2 TR, out Vector2 BL, out Vector2 BR)
-        {
-            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
-            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
-
-            pixelSize.GetBordersRectangleByPivot(pivot, out var TL2, out var BR2);
-
-            if (pixelSize.X < 0) (TL2.X, BR2.X) = (BR2.X, TL2.X);
-            if (pixelSize.Y < 0) (TL2.Y, BR2.Y) = (BR2.Y, TL2.Y);
 
             pos = parentPos + pos;
-            TL = MathExtensions.RotateVector(TL2.X, TL2.Y, pos, sin, cos);
-            TR = MathExtensions.RotateVector(BR2.X, TL2.Y, pos, sin, cos);
-            BL = MathExtensions.RotateVector(TL2.X, BR2.Y, pos, sin, cos);
-            BR = MathExtensions.RotateVector(BR2.X, BR2.Y, pos, sin, cos);
+            TR = MathExtensions.RotateVector(BR.X, TL.Y, pos, sin, cos);
+            BL = MathExtensions.RotateVector(TL.X, BR.Y, pos, sin, cos);
+            TL = TL.RotateVector(pos, sin, cos);
+            BR = BR.RotateVector(pos, sin, cos);
         }
     }
 }
