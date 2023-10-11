@@ -10,6 +10,7 @@ using RenderHierarchyLib.Models.Text;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using static System.Net.Mime.MediaTypeNames;
+using static Microsoft.Xna.Framework.Graphics.SpriteFont;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -26,11 +27,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly EffectPass _spritePass;
         private SpriteEffect _spriteEffect;
 
+        private readonly List<Vector2> _textSizesCache;
+
         private bool _beginCalled;
         private float _pixelScale;
         private Vector2 _posPixelScale;
 
-        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int capacity = 256)
+        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int spriteCapacity = 256, int textSizesCapacity = 8)
         {
             GraphicsDevice = graphicsDevice ?? 
                 throw new ArgumentNullException("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
@@ -38,7 +41,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _spriteEffect = new SpriteEffect(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
-            _batcher = new HierarchySpriteBatcher(graphicsDevice, capacity);
+            _batcher = new HierarchySpriteBatcher(graphicsDevice, spriteCapacity);
+            _textSizesCache = new List<Vector2>(textSizesCapacity);
         }
 
         public void Begin(BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
@@ -170,10 +174,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (flagVertical)
                 {
                     origin.Y *= -1f;
-                    zero.Y = (float)spriteFont.LineSpacing - size.Y;
+                    zero.Y = (float)spriteFont.HeightSpacing - size.Y;
                 }
             }
-
+            
             Matrix matrix = Matrix.Identity;
             float sin = 0f;
             float cos = 0f;
@@ -279,6 +283,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public unsafe void CameraTextRender(CustomSpriteFont font, string text, Color defaultColor, List<TextColorIndexes> colors,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
+            var lines = text.Split('\n');
+
             font.MeasureString(ref text, out var size);
         }
 
@@ -370,7 +376,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateRectangle(_camera.GetAnchorPosWorld(anchor), pos * _posPixelScale, rot + _camera.Transform.Rot,
+            CalculateVertexes(_camera.GetAnchorPosWorld(anchor), pos * _posPixelScale, rot + _camera.Transform.Rot,
                 sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
@@ -389,7 +395,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateRectangle(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot,
+            CalculateVertexes(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot,
                 sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
@@ -401,7 +407,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
         }
 
-        private static void CalculateRectangle(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot, 
+        private static void CalculateVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
             out Vector2 TL, out Vector2 TR, out Vector2 BL, out Vector2 BR)
         {
             pixelSize.GetBordersRectangleByPivot(pivot, out TL, out BR);
@@ -425,5 +431,30 @@ namespace Microsoft.Xna.Framework.Graphics
             TL = TL.RotateVector(pos, sin, cos);
             BR = BR.RotateVector(pos, sin, cos);
         }
+
+        /*private static void CalculateTextVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
+            out Vector2 origin, out Vector2 dirRight, out Vector2 dirDown)
+        {
+            pixelSize.GetBordersRectangleByPivot(pivot, out TL, out BR);
+
+            if (pixelSize.X < 0) (TL.X, BR.X) = (BR.X, TL.X);
+            if (pixelSize.Y < 0) (TL.Y, BR.Y) = (BR.Y, TL.Y);
+
+            if (rot == 0)
+            {
+                TR.X = BR.X; TR.Y = TL.Y;
+                BL.X = TL.X; BL.Y = BR.Y;
+                return;
+            }
+
+            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
+            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+            pos = parentPos + pos;
+            TR = MathExtensions.RotateVector(BR.X, TL.Y, pos, sin, cos);
+            BL = MathExtensions.RotateVector(TL.X, BR.Y, pos, sin, cos);
+            TL = TL.RotateVector(pos, sin, cos);
+            BR = BR.RotateVector(pos, sin, cos);
+        }*/
     }
 }

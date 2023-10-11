@@ -36,6 +36,42 @@ namespace RenderHierarchyLib.Models.Text
             }
         }
 
+        public struct Glyph
+        {
+            public char Character;
+            public Rectangle BoundsInTexture;
+
+            public float LeftBearing;
+            public float RightBearing;
+            public float Height;
+            public float Width;
+
+            public float WidthIncludingBearings => LeftBearing + Width + RightBearing;
+
+            public static readonly Glyph Empty;
+
+            public Glyph(SpriteFont.Glyph glyph)
+            {
+                Character = glyph.Character;
+                BoundsInTexture = glyph.BoundsInTexture;
+                LeftBearing = glyph.LeftSideBearing;
+                RightBearing = glyph.RightSideBearing;
+                Height = glyph.Cropping.Height;
+                Width = glyph.Width;
+            }
+
+            public override readonly string ToString()
+            {
+                return string.Join(',',
+                    $"{nameof(Character)}={Character}",
+                    $"{nameof(BoundsInTexture)}={BoundsInTexture}",
+                    $"{nameof(LeftBearing)}={LeftBearing}",
+                    $"{nameof(RightBearing)}={RightBearing}",
+                    $"{nameof(Height)}={Height}",
+                    $"{nameof(Width)}={Width}");
+            }
+        }
+
         private readonly Glyph[] _glyphs;
         private readonly CharacterRegion[] _regions;
         private char? _defaultCharacter;
@@ -46,8 +82,10 @@ namespace RenderHierarchyLib.Models.Text
         public CharacterRegion[] Regions => _regions;
         public Texture2D Texture => _texture;
         public ReadOnlyCollection<char> Characters { get; private set; }
-        public int LineSpacing { get; set; }
-        public float Spacing { get; set; }
+
+        public float WidthSpacing { get; set; }
+        public float HeightSpacing { get; set; }
+
         public char? DefaultCharacter
         {
             get
@@ -70,36 +108,39 @@ namespace RenderHierarchyLib.Models.Text
             }
         }
 
+        public SpriteFont DefaultFont { get; set; } = null;
+
+
         public CustomSpriteFont(SpriteFont font)
         {
             Characters = font.Characters;
             _texture = font.Texture;
-            LineSpacing = font.LineSpacing;
-            Spacing = font.Spacing;
-            _glyphs = font.Glyphs;
+            HeightSpacing = font.LineSpacing;
+            WidthSpacing = font.Spacing;
+            _glyphs = font.GetGlyphsArray();
             _regions = font.GetCharacterRegions();
             DefaultCharacter = font.DefaultCharacter;
+            DefaultFont = font;
         }
 
         public CustomSpriteFont(Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters, int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
         {
             Characters = new ReadOnlyCollection<char>(characters.ToArray());
             _texture = texture;
-            LineSpacing = lineSpacing;
-            Spacing = spacing;
+            HeightSpacing = lineSpacing;
+            WidthSpacing = spacing;
             _glyphs = new Glyph[characters.Count];
             var stack = new Stack<CharacterRegion>();
             for (int i = 0; i < characters.Count; i++)
             {
                 _glyphs[i] = new Glyph
                 {
-                    BoundsInTexture = glyphBounds[i],
-                    Cropping = cropping[i],
                     Character = characters[i],
-                    LeftSideBearing = kerning[i].X,
+                    BoundsInTexture = glyphBounds[i],
+                    LeftBearing = kerning[i].X,
+                    RightBearing = kerning[i].Z,
                     Width = kerning[i].Y,
-                    RightSideBearing = kerning[i].Z,
-                    WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
+                    Height = cropping[i].Height
                 };
                 if (stack.Count == 0 || characters[i] > stack.Peek().End + 1)
                 {
@@ -135,6 +176,7 @@ namespace RenderHierarchyLib.Models.Text
             return dictionary;
         }
 
+
         public unsafe void MeasureString(ref string text, out Vector2 size)
         {
             if (text.Length == 0)
@@ -143,22 +185,21 @@ namespace RenderHierarchyLib.Models.Text
                 return;
             }
 
-            float num = 0f;
-            float num2 = LineSpacing;
+            float sizeX = 0f;
+            float num2 = HeightSpacing;
             Vector2 zero = Vector2.Zero;
             var flagLines = true;
             fixed (Glyph* ptr = Glyphs)
             {
-
                 for (int i = 0; i < text.Length; i++)
                 {
                     char c = text[i];
                     switch (c)
                     {
                         case '\n':
-                            num2 = LineSpacing;
+                            num2 = HeightSpacing;
                             zero.X = 0f;
-                            zero.Y += LineSpacing;
+                            zero.Y += HeightSpacing;
                             flagLines = true;
                             continue;
                         case '\r':
@@ -169,30 +210,30 @@ namespace RenderHierarchyLib.Models.Text
                     Glyph* ptr2 = ptr + glyphIndexOrDefault;
                     if (flagLines)
                     {
-                        zero.X = Math.Max(ptr2->LeftSideBearing, 0f);
+                        zero.X = Math.Max(ptr2->LeftBearing, 0f);
                         flagLines = false;
                     }
                     else
                     {
-                        zero.X += Spacing + ptr2->LeftSideBearing;
+                        zero.X += WidthSpacing + ptr2->LeftBearing;
                     }
 
                     zero.X += ptr2->Width;
-                    float num3 = zero.X + Math.Max(ptr2->RightSideBearing, 0f);
-                    if (num3 > num)
+                    float num3 = zero.X + Math.Max(ptr2->RightBearing, 0f);
+                    if (num3 > sizeX)
                     {
-                        num = num3;
+                        sizeX = num3;
                     }
 
-                    zero.X += ptr2->RightSideBearing;
-                    if (ptr2->Cropping.Height > num2)
+                    zero.X += ptr2->RightBearing;
+                    if (ptr2->Height > num2)
                     {
-                        num2 = ptr2->Cropping.Height;
+                        num2 = ptr2->Height;
                     }
                 }
             }
 
-            size.X = num;
+            size.X = sizeX;
             size.Y = zero.Y + num2;
         }
         public unsafe bool TryGetGlyphIndex(char c, out int index)

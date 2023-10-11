@@ -64,7 +64,7 @@ namespace TestingDesktop
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            //RenderText(gameTime);
+            RenderText(gameTime);
             Render(gameTime);
 
             base.Draw(gameTime);
@@ -72,18 +72,18 @@ namespace TestingDesktop
 
         private void RenderText(GameTime gameTime)
         {
-            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 25;
+            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 0;
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(_font1.Font.Texture, new Vector2(200, 0), Color.White);
-            /*
-            _spriteBatch.DrawString(_font1.Font, "Test \n textfghfhfhghfgh", new Vector2(200, 200), Color.White,
+            //_spriteBatch.Draw(_font1.Font.Texture, new Vector2(200, 0), Color.White);
+            
+            _spriteBatch.DrawString(_font1.Font.DefaultFont, "Tes\rt \n textfghfhfhghfgh", new Vector2(200, 200), Color.White,
                 counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
-            */
+            
             _spriteBatch.End();
 
             _hierarchySpriteBatch.Begin();
-            _hierarchySpriteBatch.RenderTextTest(_font1.Font, "Test text");
+            //_hierarchySpriteBatch.RenderTextTest(_font1.Font, "Test text");
             _hierarchySpriteBatch.End();
         }
 

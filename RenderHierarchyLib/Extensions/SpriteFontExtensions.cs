@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using RenderHierarchyLib.Models.Text;
 using RenderHierarchyLib.Render.Text;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,17 @@ namespace RenderHierarchyLib.Extensions
 {
     public static class SpriteFontExtensions
     {
+        public static CustomSpriteFont.Glyph[] GetGlyphsArray(this SpriteFont font)
+        {
+            var length = font.Glyphs.Length;
+            var glyphs = new CustomSpriteFont.Glyph[length];
+
+            for ( var i = 0; i < length; i++)
+                glyphs[i] = new CustomSpriteFont.Glyph(font.Glyphs[i]);
+
+            return glyphs;
+        }
+
         public static CharacterRegion[] GetCharacterRegions(this SpriteFont font)
         {
             var stack = new Stack<CharacterRegion>();
