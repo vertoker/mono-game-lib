@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.Xna.Framework.Graphics.SpriteFont;
@@ -97,7 +98,10 @@ namespace RenderHierarchyLib.Models.Text
                 if (value.HasValue)
                 {
                     if (!TryGetGlyphIndex(value.Value, out _defaultGlyphIndex))
+                    {
                         throw new ArgumentException("Character cannot be resolved by this SpriteFont.");
+                    }
+
                 }
                 else
                 {
@@ -176,15 +180,20 @@ namespace RenderHierarchyLib.Models.Text
             return dictionary;
         }
 
-
-        public unsafe void MeasureString(ref string text, out Vector2 size)
+        public unsafe void SetGlyphIndexes(ref string text, UnsafeList<int> glyphIndexes)
         {
-            if (text.Length == 0)
-            {
-                size = Vector2.Zero;
-                return;
-            }
+            var length = text.Length;
+            glyphIndexes.Clear();
+            glyphIndexes.EnsureCapacity(length);
 
+            fixed (char* ptrChar = text)
+            fixed (int* ptrGlyphIndex = glyphIndexes.Items)
+            fixed (CharacterRegion* ptrRegion = _regions)
+                for (int i = 0; i < length; i++)
+                    GetGlyphIndex(ref ptrChar[i], ptrRegion, ref ptrGlyphIndex[i]);
+        }
+        public unsafe void MeasureString(ref string text, UnsafeList<int> glyphIndexes, out Vector2 size)
+        {
             float sizeX = 0f;
             float num2 = HeightSpacing;
             Vector2 zero = Vector2.Zero;
@@ -206,7 +215,7 @@ namespace RenderHierarchyLib.Models.Text
                             continue;
                     }
 
-                    int glyphIndexOrDefault = GetGlyphIndexOrDefault(c);
+                    int glyphIndexOrDefault = 0;// GetGlyphIndexOrDefault(c);
                     Glyph* ptr2 = ptr + glyphIndexOrDefault;
                     if (flagLines)
                     {
@@ -236,57 +245,53 @@ namespace RenderHierarchyLib.Models.Text
             size.X = sizeX;
             size.Y = zero.Y + num2;
         }
-        public unsafe bool TryGetGlyphIndex(char c, out int index)
-        {
-            fixed (CharacterRegion* ptr = _regions)
-            {
-                int num = -1;
-                int num2 = 0;
-                int num3 = _regions.Length - 1;
-                while (num2 <= num3)
-                {
-                    int num4 = num2 + num3 >> 1;
-                    if (ptr[num4].End < c)
-                    {
-                        num2 = num4 + 1;
-                        continue;
-                    }
 
-                    if (ptr[num4].Start > c)
-                    {
-                        num3 = num4 - 1;
-                        continue;
-                    }
 
-                    num = num4;
-                    break;
-                }
-
-                if (num == -1)
-                {
-                    index = -1;
-                    return false;
-                }
-
-                index = ptr[num].StartIndex + (c - ptr[num].Start);
-            }
-
-            return true;
-        }
 
         public int GetGlyphIndexOrDefault(char c)
         {
             if (!TryGetGlyphIndex(c, out var index))
+                throw new ArgumentException("Text contains characters that cannot be resolved by this SpriteFont.", "text");
+            return index;
+        }
+        public unsafe bool TryGetGlyphIndex(char c, out int index)
+        {
+            index = -1;
+            fixed (CharacterRegion* ptrRegion = _regions)
+                GetGlyphIndex(ref c, ptrRegion, ref index);
+            return index != -1;
+        }
+        public unsafe void GetGlyphIndex(ref char c, CharacterRegion* ptrRegion, ref int index)
+        {
+            var num = -1;
+            var num2 = 0;
+            var num3 = _regions.Length - 1;
+            while (num2 <= num3)
             {
-                if (_defaultGlyphIndex == -1)
+                var num4 = num2 + num3 >> 1;
+                if (ptrRegion[num4].End < c)
                 {
-                    throw new ArgumentException("Text contains characters that cannot be resolved by this SpriteFont.", "text");
+                    num2 = num4 + 1;
+                    continue;
                 }
 
-                return _defaultGlyphIndex;
+                if (ptrRegion[num4].Start > c)
+                {
+                    num3 = num4 - 1;
+                    continue;
+                }
+
+                num = num4;
+                break;
             }
 
-            return index;
+            if (num == -1)
+            {
+                index = -1;
+                return;
+            }
+
+            index = ptrRegion[num].StartIndex + (c - ptrRegion[num].Start);
         }
     }
 }

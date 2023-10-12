@@ -3,14 +3,10 @@ using RenderHierarchyLib.Extensions;
 using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Models.Transform;
 using RenderHierarchyLib.Render.Sprite;
-using System;
-using static System.Formats.Asn1.AsnWriter;
-using System.Drawing;
 using RenderHierarchyLib.Models.Text;
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
+using System;
 using static System.Net.Mime.MediaTypeNames;
-using static Microsoft.Xna.Framework.Graphics.SpriteFont;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -27,13 +23,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly EffectPass _spritePass;
         private SpriteEffect _spriteEffect;
 
-        private readonly List<Vector2> _textSizesCache;
+        private readonly UnsafeList<int> _glyphIndexes;
 
         private bool _beginCalled;
         private float _pixelScale;
         private Vector2 _posPixelScale;
 
-        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int spriteCapacity = 256, int textSizesCapacity = 8)
+        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int spriteCapacity = 256, int glyphIndexesCapacity = 16)
         {
             GraphicsDevice = graphicsDevice ?? 
                 throw new ArgumentNullException("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
@@ -42,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _spriteEffect = new SpriteEffect(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
             _batcher = new HierarchySpriteBatcher(graphicsDevice, spriteCapacity);
-            _textSizesCache = new List<Vector2>(textSizesCapacity);
+            _glyphIndexes = new UnsafeList<int>(glyphIndexesCapacity);
         }
 
         public void Begin(BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
@@ -77,30 +73,19 @@ namespace Microsoft.Xna.Framework.Graphics
             _beginCalled = false;
         }
 
-        private void CheckValid(Texture2D texture)
+        private bool CheckErrorSprite(Texture2D texture)
         {
-            if (texture == null)
-                throw new ArgumentNullException("texture");
-
-            if (!_beginCalled)
-                throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
+            if (texture == null) return true;
+            if (!_beginCalled) return true;
+            return false;
         }
-        private void CheckValid(CustomSpriteFont spriteFont, string text)
+
+        private bool CheckErrorText(CustomSpriteFont spriteFont, string text)
         {
-            if (spriteFont == null)
-            {
-                throw new ArgumentNullException("spriteFont");
-            }
-
-            if (text == null)
-            {
-                throw new ArgumentNullException("text");
-            }
-
-            if (!_beginCalled)
-            {
-                throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
-            }
+            if (spriteFont == null) return true;
+            if (text == null) return true;
+            if (!_beginCalled) return true;
+            return false;
         }
 
         public HierarchySpriteBatchItem CreateBatchItem() => _batcher.CreateBatchItem();
@@ -108,13 +93,15 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Tests
         public void RenderTextTest(CustomSpriteFont font, string text)
         {
-            CheckValid(font, text);
-            RenderTest(font.Texture);
+            if (CheckErrorText(font, text)) return;
+            font.SetGlyphIndexes(ref text, _glyphIndexes);
+            //RenderTest(font.Texture);
         }
 
         public void RenderTest(Texture2D texture, float angle = 0)
         {
-            CheckValid(texture);
+            if (CheckErrorSprite(texture)) return;
+
             var spriteBatchItem = CreateBatchItem();
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = 0;
@@ -157,11 +144,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
-            CheckValid(spriteFont, text);
+            if (CheckErrorText(spriteFont, text)) return;
 
             Vector2 zero = Vector2.Zero;
             bool flagVertical = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
             bool flagHorizontal = (effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
+            /*
             if (flagVertical || flagHorizontal)
             {
                 spriteFont.MeasureString(ref text, out var size);
@@ -177,6 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     zero.Y = (float)spriteFont.HeightSpacing - size.Y;
                 }
             }
+            */
             
             Matrix matrix = Matrix.Identity;
             float sin = 0f;
@@ -283,9 +272,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public unsafe void CameraTextRender(CustomSpriteFont font, string text, Color defaultColor, List<TextColorIndexes> colors,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
-            var lines = text.Split('\n');
-
-            font.MeasureString(ref text, out var size);
+            if (CheckErrorText(font, text)) return;
+            font.SetGlyphIndexes(ref text, _glyphIndexes);
         }
 
 
@@ -372,6 +360,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public void WorldRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth)
         {
+            if (CheckErrorSprite(texture)) return;
+
             var spriteBatchItem = CreateBatchItem();
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
@@ -391,6 +381,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public void CameraRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth)
         {
+            if (CheckErrorSprite(texture)) return;
+
             var spriteBatchItem = CreateBatchItem();
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;

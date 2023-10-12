@@ -77,13 +77,13 @@ namespace TestingDesktop
             _spriteBatch.Begin();
             //_spriteBatch.Draw(_font1.Font.Texture, new Vector2(200, 0), Color.White);
             
-            _spriteBatch.DrawString(_font1.Font.DefaultFont, "Tes\rt \n textfghfhfhghfgh", new Vector2(200, 200), Color.White,
+            _spriteBatch.DrawString(_font1.Font.DefaultFont, "test", new Vector2(200, 200), Color.White,//Tes\rt \n textfghfhfhghfgh
                 counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
-            
+
             _spriteBatch.End();
 
             _hierarchySpriteBatch.Begin();
-            //_hierarchySpriteBatch.RenderTextTest(_font1.Font, "Test text");
+            _hierarchySpriteBatch.RenderTextTest(_font1.Font, "Tes\rt \n textfghfhfhghfgh");
             _hierarchySpriteBatch.End();
         }
 

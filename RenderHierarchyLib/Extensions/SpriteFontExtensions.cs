@@ -26,7 +26,7 @@ namespace RenderHierarchyLib.Extensions
         {
             var stack = new Stack<CharacterRegion>();
 
-            for (int i = 0; i < stack.Count; i++)
+            for (int i = 0; i < font.Characters.Count; i++)
             {
                 var glyph = font.Glyphs[i];
                 if (stack.Count == 0 || glyph.Character > stack.Peek().End + 1)
@@ -45,6 +45,7 @@ namespace RenderHierarchyLib.Extensions
 
                 throw new InvalidOperationException("Invalid SpriteFont. Character map must be in ascending order.");
             }
+
 
             var regions = stack.ToArray();
             Array.Reverse(regions);
