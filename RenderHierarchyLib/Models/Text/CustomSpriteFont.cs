@@ -2,15 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using RenderHierarchyLib.Extensions;
 using RenderHierarchyLib.Render.Text;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.Xna.Framework.Graphics.SpriteFont;
+using System;
 
 namespace RenderHierarchyLib.Models.Text
 {
@@ -192,12 +186,19 @@ namespace RenderHierarchyLib.Models.Text
                 for (int i = 0; i < length; i++)
                     GetGlyphIndex(ref ptrChar[i], ptrRegion, ref ptrGlyphIndex[i]);
         }
-        public unsafe void MeasureString(ref string text, UnsafeList<int> glyphIndexes, out Vector2 size)
+
+        public unsafe void MeasureString(string text, out Vector2 size)
         {
-            float sizeX = 0f;
+            if (text.Length == 0)
+            {
+                size = Vector2.Zero;
+                return;
+            }
+
+            float num = 0f;
             float num2 = HeightSpacing;
             Vector2 zero = Vector2.Zero;
-            var flagLines = true;
+            bool flag = true;
             fixed (Glyph* ptr = Glyphs)
             {
                 for (int i = 0; i < text.Length; i++)
@@ -209,18 +210,18 @@ namespace RenderHierarchyLib.Models.Text
                             num2 = HeightSpacing;
                             zero.X = 0f;
                             zero.Y += HeightSpacing;
-                            flagLines = true;
+                            flag = true;
                             continue;
                         case '\r':
                             continue;
                     }
 
-                    int glyphIndexOrDefault = 0;// GetGlyphIndexOrDefault(c);
-                    Glyph* ptr2 = ptr + glyphIndexOrDefault;
-                    if (flagLines)
+                    int glyphIndexOrDefault = GetGlyphIndexOrDefault(c);
+                    var ptr2 = ptr + glyphIndexOrDefault;
+                    if (flag)
                     {
                         zero.X = Math.Max(ptr2->LeftBearing, 0f);
-                        flagLines = false;
+                        flag = false;
                     }
                     else
                     {
@@ -229,9 +230,9 @@ namespace RenderHierarchyLib.Models.Text
 
                     zero.X += ptr2->Width;
                     float num3 = zero.X + Math.Max(ptr2->RightBearing, 0f);
-                    if (num3 > sizeX)
+                    if (num3 > num)
                     {
-                        sizeX = num3;
+                        num = num3;
                     }
 
                     zero.X += ptr2->RightBearing;
@@ -239,6 +240,56 @@ namespace RenderHierarchyLib.Models.Text
                     {
                         num2 = ptr2->Height;
                     }
+                }
+            }
+
+            size.X = num;
+            size.Y = zero.Y + num2;
+        }
+
+        public unsafe void MeasureStringPtr(int* ptrGlyphIndex, Glyph* ptrGlyph, char* ptrText, int length, out Vector2 size)
+        {
+            float sizeX = 0f;
+            float num2 = HeightSpacing;
+            Vector2 zero = Vector2.Zero;
+            var flagLines = true;
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (ptrText[i])
+                {
+                    case '\n':
+                        num2 = HeightSpacing;
+                        zero.X = 0f;
+                        zero.Y += HeightSpacing;
+                        flagLines = true;
+                        continue;
+                    case '\r':
+                        continue;
+                }
+
+                Glyph glyph = ptrGlyph[ptrGlyphIndex[i]];
+                if (flagLines)
+                {
+                    zero.X = Math.Max(glyph.LeftBearing, 0f);
+                    flagLines = false;
+                }
+                else
+                {
+                    zero.X += WidthSpacing + glyph.LeftBearing;
+                }
+
+                zero.X += glyph.Width;
+                float num3 = zero.X + Math.Max(glyph.RightBearing, 0f);
+                if (num3 > sizeX)
+                {
+                    sizeX = num3;
+                }
+
+                zero.X += glyph.RightBearing;
+                if (glyph.Height > num2)
+                {
+                    num2 = glyph.Height;
                 }
             }
 

@@ -274,6 +274,43 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (CheckErrorText(font, text)) return;
             font.SetGlyphIndexes(ref text, _glyphIndexes);
+
+            fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
+            {
+                fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
+                {
+                    fixed (char* ptrText = text)
+                    {
+                        font.MeasureStringPtr(ptrGlyphIndex, ptrGlyph, ptrText, _glyphIndexes.Size, out var size);
+                        CalculateTextVertexes(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot, sca * _pixelScale, pivot,
+                            out var origin, out var dirRight, out var dirDown);
+
+                        for (int i = 0; i < _glyphIndexes.Size; i++)
+                        {
+
+                        }
+
+                        for (int i = 0; i < _glyphIndexes.Size; i++)
+                        {
+                            if (ptrText[i] == '\n')
+                            {
+
+                            }
+                            else if (ptrText[i] == '\r')
+                            {
+
+                            }
+                            var glyph = ptrGlyph[ptrGlyphIndex[i]];
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void CalculateTextVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
+            out Vector2 origin, out Vector2 dirRight, out Vector2 dirDown)
+        {
+
         }
 
 
