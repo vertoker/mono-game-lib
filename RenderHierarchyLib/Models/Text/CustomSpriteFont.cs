@@ -49,8 +49,8 @@ namespace RenderHierarchyLib.Models.Text
             {
                 Character = glyph.Character;
                 BoundsInTexture = glyph.BoundsInTexture;
-                LeftBearing = glyph.LeftSideBearing;
-                RightBearing = glyph.RightSideBearing;
+                LeftBearing = Math.Max(glyph.LeftSideBearing, 0f);
+                RightBearing = Math.Max(glyph.RightSideBearing, 0f);
                 Height = glyph.Cropping.Height;
                 Width = glyph.Width;
             }
@@ -174,17 +174,27 @@ namespace RenderHierarchyLib.Models.Text
             return dictionary;
         }
 
-        public unsafe void SetGlyphIndexes(ref string text, UnsafeList<int> glyphIndexes)
+        public unsafe void SetGlyphIndexes(ref string text, UnsafeList<int> glyphIndexes, out int lines)
         {
             var length = text.Length;
             glyphIndexes.Clear();
             glyphIndexes.EnsureCapacity(length);
+            lines = 1;
 
             fixed (char* ptrChar = text)
-            fixed (int* ptrGlyphIndex = glyphIndexes.Items)
-            fixed (CharacterRegion* ptrRegion = _regions)
-                for (int i = 0; i < length; i++)
-                    GetGlyphIndex(ref ptrChar[i], ptrRegion, ref ptrGlyphIndex[i]);
+            {
+                fixed (int* ptrGlyphIndex = glyphIndexes.Items)
+                {
+                    fixed (CharacterRegion* ptrRegion = _regions)
+                    {
+                        for (int i = 0; i < length; i++)
+                        {
+                            GetGlyphIndex(ref ptrChar[i], ptrRegion, ref ptrGlyphIndex[i]);
+                            if (ptrChar[i] == '\n') lines++;
+                        }
+                    }
+                }
+            }
         }
 
         public unsafe void MeasureString(string text, out Vector2 size)

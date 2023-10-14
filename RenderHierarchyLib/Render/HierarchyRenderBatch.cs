@@ -7,6 +7,7 @@ using RenderHierarchyLib.Models.Text;
 using System.Collections.Generic;
 using System;
 using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -24,12 +25,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private SpriteEffect _spriteEffect;
 
         private readonly UnsafeList<int> _glyphIndexes;
+        private readonly UnsafeList<Vector2> _lineOrigins;
 
         private bool _beginCalled;
         private float _pixelScale;
         private Vector2 _posPixelScale;
 
-        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int spriteCapacity = 256, int glyphIndexesCapacity = 16)
+        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int spriteCapacity = 256, int glyphIndexesCapacity = 16, int lineOriginsCapacity = 4)
         {
             GraphicsDevice = graphicsDevice ?? 
                 throw new ArgumentNullException("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
@@ -39,6 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
             _batcher = new HierarchySpriteBatcher(graphicsDevice, spriteCapacity);
             _glyphIndexes = new UnsafeList<int>(glyphIndexesCapacity);
+            _lineOrigins = new UnsafeList<Vector2>(lineOriginsCapacity);
         }
 
         public void Begin(BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
@@ -94,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void RenderTextTest(CustomSpriteFont font, string text)
         {
             if (CheckErrorText(font, text)) return;
-            font.SetGlyphIndexes(ref text, _glyphIndexes);
+            font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
             //RenderTest(font.Texture);
         }
 
@@ -273,44 +276,83 @@ namespace Microsoft.Xna.Framework.Graphics
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
             if (CheckErrorText(font, text)) return;
-            font.SetGlyphIndexes(ref text, _glyphIndexes);
+            font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
+            _lineOrigins.EnsureCapacity(lines);
+
+            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
+            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
 
             fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
             {
                 fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
                 {
-                    fixed (char* ptrText = text)
+                    fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
                     {
-                        font.MeasureStringPtr(ptrGlyphIndex, ptrGlyph, ptrText, _glyphIndexes.Size, out var size);
-                        CalculateTextVertexes(_camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, rot, sca * _pixelScale, pivot,
-                            out var origin, out var dirRight, out var dirDown);
-
-                        for (int i = 0; i < _glyphIndexes.Size; i++)
+                        fixed (char* ptrText = text)
                         {
+                            CalculateTextVectors(font, _glyphIndexes.Size, ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
+                                _camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, sin, cos, sca, pivot,
+                                out var dirRight, out var dirDown);
 
-                        }
-
-                        for (int i = 0; i < _glyphIndexes.Size; i++)
-                        {
-                            if (ptrText[i] == '\n')
+                            for (int i = 0; i < _glyphIndexes.Size; i++)
                             {
+                                if (ptrText[i] == '\n')
+                                {
 
-                            }
-                            else if (ptrText[i] == '\r')
-                            {
+                                }
+                                else if (ptrText[i] == '\r')
+                                {
 
+                                }
+                                var glyph = ptrGlyph[ptrGlyphIndex[i]];
                             }
-                            var glyph = ptrGlyph[ptrGlyphIndex[i]];
                         }
                     }
                 }
             }
         }
-
-        private static void CalculateTextVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
-            out Vector2 origin, out Vector2 dirRight, out Vector2 dirDown)
+         
+        private static unsafe void CalculateTextVectors(CustomSpriteFont font, int textLength,// int lineCount,
+            int* ptrGlyphIndex, CustomSpriteFont.Glyph* ptrGlyph, char* ptrText, Vector2* ptrLineOrigin,
+            Vector2 parentPos, Vector2 pos, float sin, float cos, Vector2 sca, Vector2 pivot, out Vector2 dirRight, out Vector2 dirUp)
         {
+            dirRight = (sca.X < 0 ? -Vector2.UnitX : Vector2.UnitX).RotateVector(sin, cos);
+            dirUp = (sca.Y < 0 ? -Vector2.UnitY : Vector2.UnitY).RotateVector(sin, cos);
+            var dirDown = -dirUp;
 
+            var flagLines = true;
+            var textSize = Vector2.Zero;
+            var counterLines = 0;
+            ptrLineOrigin[0] = Vector2.Zero;
+
+            for (int i = 0; i < textLength; i++)
+            {
+                switch (ptrText[i])
+                {
+                    case '\n':
+                        counterLines++;
+                        flagLines = true;
+                        textSize.Y += font.HeightSpacing;
+                        ptrLineOrigin[counterLines] = Vector2.Zero;
+                        continue;
+                    case '\r':
+                        continue;
+                }
+
+                if (flagLines) flagLines = false;
+                else ptrLineOrigin[counterLines].X += font.WidthSpacing;
+
+                var glyph = ptrGlyph[ptrGlyphIndex[i]];
+                ptrLineOrigin[counterLines].X += glyph.WidthIncludingBearings;
+
+                if (glyph.Height > ptrLineOrigin[counterLines].Y)
+                    ptrLineOrigin[counterLines].Y = glyph.Height;
+                if (ptrLineOrigin[counterLines].X > textSize.X)
+                    textSize.X = ptrLineOrigin[counterLines].X;
+            }
+
+            //size.X = sizeX;
+            //size.Y = zero.Y + num2;
         }
 
 
