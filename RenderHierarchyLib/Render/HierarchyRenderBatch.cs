@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System;
 using static System.Net.Mime.MediaTypeNames;
 using System.Drawing;
+using RenderHierarchyLib.Extensions.MonoGame;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -294,18 +295,44 @@ namespace Microsoft.Xna.Framework.Graphics
                                 _camera.GetAnchorPosCamera(anchor), pos * _posPixelScale, sin, cos, sca, pivot,
                                 out var dirRight, out var dirDown);
 
+                            var flagLines = true;
+                            var counterLines = 0;
+                            var charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
                             for (int i = 0; i < _glyphIndexes.Size; i++)
                             {
                                 if (ptrText[i] == '\n')
                                 {
-
+                                    flagLines = true;
+                                    counterLines++;
+                                    charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                                    continue;
                                 }
                                 else if (ptrText[i] == '\r')
                                 {
-
+                                    continue;
                                 }
+
                                 var glyph = ptrGlyph[ptrGlyphIndex[i]];
+                                var item = CreateBatchItem();
+                                var rect = glyph.BoundsInTexture;
+
+                                item.Texture = font.Texture;
+                                item.SortKey = depth;
+
+                                var downHeight = dirDown * glyph.Height;
+                                charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
+
+                                item.vertexTL.Setup(charOrigin, defaultColor, rect.TL());
+                                item.vertexBL.Setup(charOrigin.Plus(downHeight), defaultColor, rect.BL());
+
+                                charOrigin = charOrigin.Plus(dirRight * glyph.Width);
+                                item.vertexTR.Setup(charOrigin, defaultColor, rect.TR());
+                                item.vertexBR.Setup(charOrigin.Plus(downHeight), defaultColor, rect.BR());
+
+                                charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
                             }
+
+                            //Console.WriteLine();
                         }
                     }
                 }
@@ -350,6 +377,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (ptrLineOrigin[counterLines].X > textSize.X)
                     textSize.X = ptrLineOrigin[counterLines].X;
             }
+
+            // convert size to points
+            // later with angle and scale
 
             //size.X = sizeX;
             //size.Y = zero.Y + num2;
@@ -451,10 +481,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
             if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
 
-            spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), color, viewStart);
-            spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
-            spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
-            spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
+            spriteBatchItem.vertexTL.Setup(new Vector3(TL.X, TL.Y, depth), color, viewStart);
+            spriteBatchItem.vertexTR.Setup(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
+            spriteBatchItem.vertexBL.Setup(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
+            spriteBatchItem.vertexBR.Setup(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
         }
 
         public void CameraRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
@@ -472,10 +502,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
             if (sca.Y < 0) (viewStart.Y, viewEnd.Y) = (viewEnd.Y, viewStart.Y);
 
-            spriteBatchItem.vertexTL = new VertexPositionColorTexture(new Vector3(TL.X, TL.Y, depth), color, viewStart);
-            spriteBatchItem.vertexTR = new VertexPositionColorTexture(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
-            spriteBatchItem.vertexBL = new VertexPositionColorTexture(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
-            spriteBatchItem.vertexBR = new VertexPositionColorTexture(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
+            spriteBatchItem.vertexTL.Setup(new Vector3(TL.X, TL.Y, depth), color, viewStart);
+            spriteBatchItem.vertexTR.Setup(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
+            spriteBatchItem.vertexBL.Setup(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
+            spriteBatchItem.vertexBR.Setup(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
         }
 
         private static void CalculateVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,

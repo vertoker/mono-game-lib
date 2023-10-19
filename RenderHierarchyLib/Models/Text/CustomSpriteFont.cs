@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using RenderHierarchyLib.Extensions;
 using RenderHierarchyLib.Render.Text;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
+using RenderHierarchyLib.Extensions.MonoGame;
 
 namespace RenderHierarchyLib.Models.Text
 {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RenderHierarchyLib.Extensions
+namespace RenderHierarchyLib.Extensions.MonoGame
 {
     public static class SpriteFontExtensions
     {
@@ -16,7 +16,7 @@ namespace RenderHierarchyLib.Extensions
             var length = font.Glyphs.Length;
             var glyphs = new CustomSpriteFont.Glyph[length];
 
-            for ( var i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
                 glyphs[i] = new CustomSpriteFont.Glyph(font.Glyphs[i]);
 
             return glyphs;
