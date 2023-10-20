@@ -365,7 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         counterLines++;
                         flagLines = true;
                         textSize.Y += font.HeightSpacing;
-                        ptrLineOrigin[counterLines] = Vector2.Zero;
+                        ptrLineOrigin[counterLines] = textSize;
                         continue;
                     case '\r':
                         continue;

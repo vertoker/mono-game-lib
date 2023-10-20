@@ -25,7 +25,11 @@ namespace TestingDesktop
 
         public Game1()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this) { GraphicsProfile = GraphicsProfile.HiDef, PreferMultiSampling = true };
+            _graphics.PreparingDeviceSettings += (object sender, PreparingDeviceSettingsEventArgs e) =>
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 16;
+            _graphics.ApplyChanges();
+
             _camera = new Camera(new TransformCamera(new(0, 0), 0, 10), _graphics);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -38,6 +42,11 @@ namespace TestingDesktop
 
         protected override void LoadContent()
         {
+
+            GraphicsDevice.RasterizerState = new RasterizerState
+            { CullMode = CullMode.CullClockwiseFace, MultiSampleAntiAlias = true };
+            GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _hierarchySpriteBatch = new HierarchyRenderBatch(GraphicsDevice, _camera);
             var font = Content.Load<SpriteFont>("TextTest");
@@ -95,16 +104,20 @@ namespace TestingDesktop
             _hierarchySpriteBatch.DrawString(_font1.Font, text, new Vector2(200, 200), Color.Yellow,//Tes\rt \n textfghfhfhghfgh
                 counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
 
-            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(200, 200), 0,
-                Vector2.One, Vector2.Zero, Vector2.Zero, 0, TextAlignmentHorizontal.Center);
+            //_hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(200, 200), 0,
+            //    Vector2.One, Vector2.Zero, Vector2.Zero, 0, TextAlignmentHorizontal.Center);
 
             _hierarchySpriteBatch.End();
         }
-
         private void Render(GameTime gameTime)
         {
             var counter = (float)gameTime.TotalGameTime.TotalSeconds * 15;
-            var counter2 = (float)gameTime.TotalGameTime.TotalSeconds * 0;
+            var counter2 = (float)gameTime.TotalGameTime.TotalSeconds * 1;
+
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(_textures[0].Texture, new Vector2(300, 100), new Rectangle(0, 0, 100, 100), Color.White, counter2, 
+                new Vector2(0.5f, 0.5f), Vector2.One, SpriteEffects.None, 0);
+            _spriteBatch.End();
 
             _hierarchySpriteBatch.Begin();
 
@@ -129,7 +142,7 @@ namespace TestingDesktop
 
             //_hierarchySpriteBatch.RenderTest(_textures[0].Texture);
 
-            _camera.Transform.Rot = counter2;
+            _camera.Transform.Rot = 0;// counter2;
 
             var child = new RenderObject() { Anchor = AnchorPresets.CenterMiddle, Pivot = AnchorPresets.RightTop, Pos = new(0.5f, 0.5f), Rot = counter };
             var child2 = child.SetParentNewTransform(parent);
