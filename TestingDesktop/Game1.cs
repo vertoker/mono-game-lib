@@ -6,6 +6,8 @@ using RenderHierarchyLib;
 using RenderHierarchyLib.Models;
 using RenderHierarchyLib.Extensions;
 using RenderHierarchyLib.Models.Text;
+using System.Diagnostics;
+using System;
 
 namespace TestingDesktop
 {
@@ -70,22 +72,32 @@ namespace TestingDesktop
             base.Draw(gameTime);
         }
 
+        private bool single = false;
         private void RenderText(GameTime gameTime)
         {
             var counter = (float)gameTime.TotalGameTime.TotalSeconds * 0;
 
+            if (single) return;
+            //single = true;
+
+            var text = "test1\ntest12\ntest123";
+
             _spriteBatch.Begin();
-            //_spriteBatch.Draw(_font1.Font.Texture, new Vector2(200, 0), Color.White);
-            /*
-            _spriteBatch.DrawString(_font1.Font.DefaultFont, "test", new Vector2(200, 200), Color.White,//Tes\rt \n textfghfhfhghfgh
+
+            _spriteBatch.DrawString(_font1.Font.DefaultFont, text, new Vector2(500, 200), Color.Green,//Tes\rt \n textfghfhfhghfgh
                 counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
-            */
+
             _spriteBatch.End();
 
             _hierarchySpriteBatch.Begin();
             //_hierarchySpriteBatch.RenderTextTest(_font1.Font, "Tes\rt \n textfghfhfhghfgh");
-            _hierarchySpriteBatch.CameraTextRender(_font1.Font, "test", Color.White, null, new Vector2(200, 200), 0,
+
+            _hierarchySpriteBatch.DrawString(_font1.Font, text, new Vector2(200, 200), Color.Yellow,//Tes\rt \n textfghfhfhghfgh
+                counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
+
+            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(200, 200), 0,
                 Vector2.One, Vector2.Zero, Vector2.Zero, 0, TextAlignmentHorizontal.Center);
+
             _hierarchySpriteBatch.End();
         }
 

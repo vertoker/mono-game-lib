@@ -9,6 +9,7 @@ using System;
 using static System.Net.Mime.MediaTypeNames;
 using System.Drawing;
 using RenderHierarchyLib.Extensions.MonoGame;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -146,6 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
         #endregion
 
 
+        private Vector2 _texCoordTL;
+        private Vector2 _texCoordBR;
         public unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
             if (CheckErrorText(spriteFont, text)) return;
@@ -192,19 +195,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 matrix.M41 = (zero.X - origin.X) * matrix.M11 + (zero.Y - origin.Y) * matrix.M21 + position.X;
                 matrix.M42 = (zero.X - origin.X) * matrix.M12 + (zero.Y - origin.Y) * matrix.M22 + position.Y;
             }
-            /*
+            
             Vector2 zero2 = Vector2.Zero;
             bool flag3 = true;
-            fixed (SpriteFont.Glyph* ptr = spriteFont.Glyphs)
+            fixed (CustomSpriteFont.Glyph* ptr = spriteFont.Glyphs)
             {
-                EditAndContinueLogEntry;
                 foreach (char c in text)
                 {
                     switch (c)
                     {
                         case '\n':
                             zero2.X = 0f;
-                            zero2.Y += spriteFont.LineSpacing;
+                            zero2.Y += spriteFont.HeightSpacing;
                             flag3 = true;
                             continue;
                         case '\r':
@@ -215,12 +217,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     var ptr2 = ptr + glyphIndexOrDefault;
                     if (flag3)
                     {
-                        zero2.X = Math.Max(ptr2->LeftSideBearing, 0f);
+                        zero2.X = Math.Max(ptr2->LeftBearing, 0f);
                         flag3 = false;
                     }
                     else
                     {
-                        zero2.X += spriteFont.Spacing + ptr2->LeftSideBearing;
+                        zero2.X += spriteFont.WidthSpacing + ptr2->LeftBearing;
                     }
 
                     Vector2 position2 = zero2;
@@ -232,18 +234,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     position2.X += ptr2->Cropping.X;
                     if (flagVertical)
                     {
-                        position2.Y += ptr2->BoundsInTexture.Height - spriteFont.LineSpacing;
+                        position2.Y += ptr2->BoundsInTexture.Height - spriteFont.WidthSpacing;
                     }
 
                     position2.Y += ptr2->Cropping.Y;
                     Vector2.Transform(ref position2, ref matrix, out position2);
                     var spriteBatchItem = CreateBatchItem();
                     spriteBatchItem.Texture = spriteFont.Texture;
-                    spriteBatchItem.SortKey = sortKey;
-                    _texCoordTL.X = (float)ptr2->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
-                    _texCoordTL.Y = (float)ptr2->BoundsInTexture.Y * spriteFont.Texture.TexelHeight;
-                    _texCoordBR.X = (float)(ptr2->BoundsInTexture.X + ptr2->BoundsInTexture.Width) * spriteFont.Texture.TexelWidth;
-                    _texCoordBR.Y = (float)(ptr2->BoundsInTexture.Y + ptr2->BoundsInTexture.Height) * spriteFont.Texture.TexelHeight;
+                    spriteBatchItem.SortKey = layerDepth;
+                    _texCoordTL.X = (float)ptr2->BoundsInTexture.X * spriteFont.TextureTexel.X;
+                    _texCoordTL.Y = (float)ptr2->BoundsInTexture.Y * spriteFont.TextureTexel.Y;
+                    _texCoordBR.X = (float)(ptr2->BoundsInTexture.X + ptr2->BoundsInTexture.Width) * spriteFont.TextureTexel.X;
+                    _texCoordBR.Y = (float)(ptr2->BoundsInTexture.Y + ptr2->BoundsInTexture.Height) * spriteFont.TextureTexel.Y;
                     if ((effects & SpriteEffects.FlipVertically) != 0)
                     {
                         float y = _texCoordBR.Y;
@@ -267,10 +269,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         spriteBatchItem.Set(position2.X, position2.Y, 0f, 0f, (float)ptr2->BoundsInTexture.Width * scale.X, (float)ptr2->BoundsInTexture.Height * scale.Y, cos, sin, color, _texCoordTL, _texCoordBR, layerDepth);
                     }
 
-                    zero2.X += ptr2->Width + ptr2->RightSideBearing;
+                    zero2.X += ptr2->Width + ptr2->RightBearing;
                 }
             }
-            */
+            
         }
 
         public unsafe void CameraTextRender(CustomSpriteFont font, string text, Color defaultColor, List<TextColorIndexes> colors,
@@ -319,20 +321,23 @@ namespace Microsoft.Xna.Framework.Graphics
                                 item.Texture = font.Texture;
                                 item.SortKey = depth;
 
-                                var downHeight = dirDown * glyph.Height;
+                                var downHeight = dirDown * glyph.Cropping.Height;
                                 charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
 
-                                item.vertexTL.Setup(charOrigin, defaultColor, rect.TL());
-                                item.vertexBL.Setup(charOrigin.Plus(downHeight), defaultColor, rect.BL());
+                                item.vertexTL.Setup(charOrigin, defaultColor, rect.TL() * font.TextureTexel);
+                                item.vertexBL.Setup(charOrigin.Plus(downHeight), defaultColor, rect.BL() * font.TextureTexel);
 
                                 charOrigin = charOrigin.Plus(dirRight * glyph.Width);
-                                item.vertexTR.Setup(charOrigin, defaultColor, rect.TR());
-                                item.vertexBR.Setup(charOrigin.Plus(downHeight), defaultColor, rect.BR());
+                                item.vertexTR.Setup(charOrigin, defaultColor, rect.TR() * font.TextureTexel);
+                                item.vertexBR.Setup(charOrigin.Plus(downHeight), defaultColor, rect.BR() * font.TextureTexel);
+
+                                Debug.WriteLine(item.vertexTL);
+                                Debug.WriteLine(item.vertexBL);
+                                Debug.WriteLine(item.vertexTR);
+                                Debug.WriteLine(item.vertexBR);
 
                                 charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
                             }
-
-                            //Console.WriteLine();
                         }
                     }
                 }
@@ -372,8 +377,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 var glyph = ptrGlyph[ptrGlyphIndex[i]];
                 ptrLineOrigin[counterLines].X += glyph.WidthIncludingBearings;
 
-                if (glyph.Height > ptrLineOrigin[counterLines].Y)
-                    ptrLineOrigin[counterLines].Y = glyph.Height;
+                if (glyph.Cropping.Height > ptrLineOrigin[counterLines].Y)
+                    ptrLineOrigin[counterLines].Y = glyph.Cropping.Height;
                 if (ptrLineOrigin[counterLines].X > textSize.X)
                     textSize.X = ptrLineOrigin[counterLines].X;
             }

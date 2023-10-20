@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
 using RenderHierarchyLib.Extensions.MonoGame;
+using System.Diagnostics;
 
 namespace RenderHierarchyLib.Models.Text
 {
@@ -35,10 +36,10 @@ namespace RenderHierarchyLib.Models.Text
         {
             public char Character;
             public Rectangle BoundsInTexture;
+            public Rectangle Cropping;
 
             public float LeftBearing;
             public float RightBearing;
-            public float Height;
             public float Width;
 
             public float WidthIncludingBearings => LeftBearing + Width + RightBearing;
@@ -49,9 +50,10 @@ namespace RenderHierarchyLib.Models.Text
             {
                 Character = glyph.Character;
                 BoundsInTexture = glyph.BoundsInTexture;
+                Cropping = glyph.Cropping;
+
                 LeftBearing = Math.Max(glyph.LeftSideBearing, 0f);
                 RightBearing = Math.Max(glyph.RightSideBearing, 0f);
-                Height = glyph.Cropping.Height;
                 Width = glyph.Width;
             }
 
@@ -62,8 +64,8 @@ namespace RenderHierarchyLib.Models.Text
                     $"{nameof(BoundsInTexture)}={BoundsInTexture}",
                     $"{nameof(LeftBearing)}={LeftBearing}",
                     $"{nameof(RightBearing)}={RightBearing}",
-                    $"{nameof(Height)}={Height}",
-                    $"{nameof(Width)}={Width}");
+                    $"{nameof(Width)}={Width}",
+                    $"{nameof(Cropping)}={Cropping}");
             }
         }
 
@@ -71,7 +73,9 @@ namespace RenderHierarchyLib.Models.Text
         private readonly CharacterRegion[] _regions;
         private char? _defaultCharacter;
         private int _defaultGlyphIndex = -1;
+
         private readonly Texture2D _texture;
+        public Vector2 TextureTexel { get; }
 
         public Glyph[] Glyphs => _glyphs;
         public CharacterRegion[] Regions => _regions;
@@ -113,6 +117,7 @@ namespace RenderHierarchyLib.Models.Text
         {
             Characters = font.Characters;
             _texture = font.Texture;
+            TextureTexel = new Vector2(1f / font.Texture.Width, 1f / font.Texture.Height);
             HeightSpacing = font.LineSpacing;
             WidthSpacing = font.Spacing;
             _glyphs = font.GetGlyphsArray();
@@ -125,6 +130,7 @@ namespace RenderHierarchyLib.Models.Text
         {
             Characters = new ReadOnlyCollection<char>(characters.ToArray());
             _texture = texture;
+            TextureTexel = new Vector2(1f / texture.Width, 1f / texture.Height);
             HeightSpacing = lineSpacing;
             WidthSpacing = spacing;
             _glyphs = new Glyph[characters.Count];
@@ -138,7 +144,7 @@ namespace RenderHierarchyLib.Models.Text
                     LeftBearing = kerning[i].X,
                     RightBearing = kerning[i].Z,
                     Width = kerning[i].Y,
-                    Height = cropping[i].Height
+                    Cropping = cropping[i]
                 };
                 if (stack.Count == 0 || characters[i] > stack.Peek().End + 1)
                 {
@@ -179,6 +185,8 @@ namespace RenderHierarchyLib.Models.Text
             var length = text.Length;
             glyphIndexes.Clear();
             glyphIndexes.EnsureCapacity(length);
+            Debug.WriteLine(length);
+            Debug.WriteLine(glyphIndexes.Size);
             lines = 1;
 
             fixed (char* ptrChar = text)
@@ -195,6 +203,8 @@ namespace RenderHierarchyLib.Models.Text
                     }
                 }
             }
+
+            glyphIndexes.Size = length;
         }
 
         public unsafe void MeasureString(string text, out Vector2 size)
@@ -246,9 +256,9 @@ namespace RenderHierarchyLib.Models.Text
                     }
 
                     zero.X += ptr2->RightBearing;
-                    if (ptr2->Height > num2)
+                    if (ptr2->Cropping.Height > num2)
                     {
-                        num2 = ptr2->Height;
+                        num2 = ptr2->Cropping.Height;
                     }
                 }
             }
@@ -297,9 +307,9 @@ namespace RenderHierarchyLib.Models.Text
                 }
 
                 zero.X += glyph.RightBearing;
-                if (glyph.Height > num2)
+                if (glyph.Cropping.Height > num2)
                 {
-                    num2 = glyph.Height;
+                    num2 = glyph.Cropping.Height;
                 }
             }
 

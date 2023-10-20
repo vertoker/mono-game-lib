@@ -5,7 +5,7 @@ namespace RenderHierarchyLib.Extensions.MonoGame
 {
     public static class VertexPositionColorTextureExtensions
     {
-        public static void Setup(this VertexPositionColorTexture vertex, Vector3 position, Color color, Vector2 textureCoordinate)
+        public static void Setup(this ref VertexPositionColorTexture vertex, Vector3 position, Color color, Vector2 textureCoordinate)
         {
             vertex.Position = position;
             vertex.Color = color;
