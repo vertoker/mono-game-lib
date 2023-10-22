@@ -84,28 +84,25 @@ namespace TestingDesktop
         private bool single = false;
         private void RenderText(GameTime gameTime)
         {
-            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 0;
+            var counter = (float)gameTime.TotalGameTime.TotalSeconds * 200;
 
             if (single) return;
             //single = true;
 
-            var text = "test 1\ntest 12\ntest 123";
+            var text = "test123\ntest12\ntest1";
 
             _spriteBatch.Begin();
 
             _spriteBatch.DrawString(_font1.Font.DefaultFont, text, new Vector2(500, 200), Color.Green,//Tes\rt \n textfghfhfhghfgh
-                counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
+                0, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
 
             _spriteBatch.End();
 
             _hierarchySpriteBatch.Begin();
             //_hierarchySpriteBatch.RenderTextTest(_font1.Font, "Tes\rt \n textfghfhfhghfgh");
 
-            _hierarchySpriteBatch.DrawString(_font1.Font, text, new Vector2(200, 200), Color.Yellow,//Tes\rt \n textfghfhfhghfgh
-                counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
-
-            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(200, 200), 0,
-                Vector2.One, AnchorPresets.LeftTop, AnchorPresets.LeftTop, 0, TextAlignmentHorizontal.Left);
+            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(0, 0), counter,
+                new Vector2(1, 1), AnchorPresets.CenterMiddle, AnchorPresets.CenterTop, 0, TextAlignmentHorizontal.Center);
 
             _hierarchySpriteBatch.End();
 
@@ -117,7 +114,7 @@ namespace TestingDesktop
             var counter2 = (float)gameTime.TotalGameTime.TotalSeconds * 1;
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(_textures[0].Texture, new Vector2(300, 100), new Rectangle(0, 0, 100, 100), Color.White, counter2, 
+            _spriteBatch.Draw(_textures[0].Texture, new Vector2(200, 0), new Rectangle(0, 0, 100, 100), Color.White, counter2, 
                 new Vector2(0.5f, 0.5f), Vector2.One, SpriteEffects.None, 0);
             _spriteBatch.End();
 

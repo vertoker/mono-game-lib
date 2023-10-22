@@ -10,6 +10,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Drawing;
 using RenderHierarchyLib.Extensions.MonoGame;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -100,7 +101,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (CheckErrorText(font, text)) return;
             font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
-            //RenderTest(font.Texture);
+            DrawString(font, text, new Vector2(200, 200), Color.Yellow,//Tes\rt \n textfghfhfhghfgh
+                0, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
         }
 
         public void RenderTest(Texture2D texture, float angle = 0)
@@ -144,16 +146,12 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.vertexBR = new VertexPositionColorTexture(baseVector + scale4 * vector, Color.White, mark4 * vector2);
             //spriteBatchItem.Set(25, 0, 150, 200, Color.White, Vector2.Zero, Vector2.One, 0);
         }
-        #endregion
-
 
         private Vector2 _texCoordTL;
         private Vector2 _texCoordBR;
-        public unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+        private unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
             if (CheckErrorText(spriteFont, text)) return;
-            Debug.WriteLine(text.Length);
-            Debug.WriteLine(spriteFont.HeightSpacing);
 
             Vector2 zero = Vector2.Zero;
             bool flagVertical = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
@@ -199,7 +197,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             
             Vector2 zero2 = Vector2.Zero;
-            Debug.WriteLine(zero2);
             bool flag3 = true;
             fixed (CustomSpriteFont.Glyph* ptr = spriteFont.Glyphs)
             {
@@ -210,7 +207,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         case '\n':
                             zero2.X = 0f;
                             zero2.Y += spriteFont.HeightSpacing;
-                            Debug.WriteLine(zero2);
                             flag3 = true;
                             continue;
                         case '\r':
@@ -243,7 +239,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     position2.Y += ptr2->Cropping.Y;
                     Vector2.Transform(ref position2, ref matrix, out position2);
-                    Debug.WriteLine(ptr2->BoundsInTexture);
 
                     var item = CreateBatchItem();
                     item.Texture = spriteFont.Texture;
@@ -335,18 +330,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+        #endregion
 
-        public unsafe void CameraTextRender(CustomSpriteFont font, string text, Color defaultColor, List<TextColorIndexes> colors,
+        #region Camera Text Render Methods
+        #endregion
+
+        public unsafe void CameraRichTextRender(CustomSpriteFont font, string text, Color color,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
             if (CheckErrorText(font, text)) return;
             font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
             _lineOrigins.EnsureCapacity(lines);
-            Debug.WriteLine(text.Length);
-            Debug.WriteLine(font.HeightSpacing);
 
-            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
+            var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
             var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+            var flagNegativeX = sca.X < 0;
+            var flagNegativeY = sca.Y < 0;
 
             fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
             {
@@ -358,13 +358,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
-                                _camera.GetAnchorPosCameraInverse(anchor), pos/* * _posPixelScale*/, sin, cos, sca, pivot, alignment,
-                                out var dirRight, out var dirUp, out var dirDown);
+                                _camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
 
                             var flagLines = true;
                             var counterLines = 0;
                             var charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
-                            Debug.WriteLine(ptrLineOrigin[counterLines]);
                             for (int i = 0; i < _glyphIndexes.Size; i++)
                             {
                                 if (ptrText[i] == '\n')
@@ -372,7 +371,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                     flagLines = true;
                                     counterLines++;
                                     charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
-                                    Debug.WriteLine(ptrLineOrigin[counterLines]);
                                     continue;
                                 }
                                 else if (ptrText[i] == '\r')
@@ -384,27 +382,126 @@ namespace Microsoft.Xna.Framework.Graphics
                                 var item = CreateBatchItem();
                                 var rect = glyph.BoundsInTexture;
 
+                                var left = rect.Left * font.TextureTexel.X;
+                                var right = rect.Right * font.TextureTexel.X;
+                                var top = rect.Top * font.TextureTexel.Y;
+                                var bottom = rect.Bottom * font.TextureTexel.Y;
+
                                 item.Texture = font.Texture;
                                 item.SortKey = depth;
 
-                                if (flagLines)
-                                {
-                                    flagLines = false;
-                                }
-                                else
-                                {
-                                    charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
-                                }
+                                if (flagLines) flagLines = false;
+                                else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
                                 var upHeight = dirDown * rect.Height;
 
-                                item.vertexTL.Setup(charOrigin.Plus(upHeight), defaultColor, rect.TL() * font.TextureTexel);
-                                item.vertexBL.Setup(charOrigin, defaultColor, rect.BL() * font.TextureTexel);
+                                item.vertexTL.Setup(charOrigin.Plus(upHeight), color, new Vector2(left, top));
+                                item.vertexBL.Setup(charOrigin, color, new Vector2(left, bottom));
 
                                 charOrigin = charOrigin.Plus(dirRight * rect.Width);
-                                item.vertexTR.Setup(charOrigin.Plus(upHeight), defaultColor, rect.TR() * font.TextureTexel);
-                                item.vertexBR.Setup(charOrigin, defaultColor, rect.BR() * font.TextureTexel);
+                                item.vertexTR.Setup(charOrigin.Plus(upHeight), color, new Vector2(right, top));
+                                item.vertexBR.Setup(charOrigin, color, new Vector2(right, bottom));
 
-                                Debug.WriteLine(glyph.BoundsInTexture);
+                                if (flagNegativeX ^ flagNegativeY)
+                                {
+                                    if (flagNegativeX)
+                                    {
+                                        (item.vertexTL, item.vertexTR) = (item.vertexTR, item.vertexTL);
+                                        (item.vertexBL, item.vertexBR) = (item.vertexBR, item.vertexBL);
+                                    }
+                                    else
+                                    {
+                                        (item.vertexTL, item.vertexBL) = (item.vertexBL, item.vertexTL);
+                                        (item.vertexTR, item.vertexBR) = (item.vertexBR, item.vertexTR);
+                                    }
+                                }
+
+                                charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public unsafe void CameraTextRender(CustomSpriteFont font, string text, Color color,
+            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
+        {
+            if (CheckErrorText(font, text)) return;
+            font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
+            _lineOrigins.EnsureCapacity(lines);
+
+            var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
+            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+            var flagNegativeX = sca.X < 0;
+            var flagNegativeY = sca.Y < 0;
+
+            fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
+            {
+                fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
+                {
+                    fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
+                    {
+                        fixed (char* ptrText = text)
+                        {
+                            CalculateTextVectors(font, _glyphIndexes.Size, lines,
+                                ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
+                                _camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
+
+                            var flagLines = true;
+                            var counterLines = 0;
+                            var charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                            for (int i = 0; i < _glyphIndexes.Size; i++)
+                            {
+                                if (ptrText[i] == '\n')
+                                {
+                                    flagLines = true;
+                                    counterLines++;
+                                    charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                                    continue;
+                                }
+                                else if (ptrText[i] == '\r')
+                                {
+                                    continue;
+                                }
+
+                                var glyph = ptrGlyph[ptrGlyphIndex[i]];
+                                var item = CreateBatchItem();
+                                var rect = glyph.BoundsInTexture;
+
+                                var left = rect.Left * font.TextureTexel.X;
+                                var right = rect.Right * font.TextureTexel.X;
+                                var top = rect.Top * font.TextureTexel.Y;
+                                var bottom = rect.Bottom * font.TextureTexel.Y;
+
+                                item.Texture = font.Texture;
+                                item.SortKey = depth;
+
+                                if (flagLines) flagLines = false;
+                                else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
+                                var upHeight = dirDown * rect.Height;
+
+                                item.vertexTL.Setup(charOrigin.Plus(upHeight), color, new Vector2(left, top));
+                                item.vertexBL.Setup(charOrigin, color, new Vector2(left, bottom));
+
+                                charOrigin = charOrigin.Plus(dirRight * rect.Width);
+                                item.vertexTR.Setup(charOrigin.Plus(upHeight), color, new Vector2(right, top));
+                                item.vertexBR.Setup(charOrigin, color, new Vector2(right, bottom));
+
+                                if (flagNegativeX ^ flagNegativeY)
+                                {
+                                    if (flagNegativeX)
+                                    {
+                                        (item.vertexTL, item.vertexTR) = (item.vertexTR, item.vertexTL);
+                                        (item.vertexBL, item.vertexBR) = (item.vertexBR, item.vertexBL);
+                                    }
+                                    else
+                                    {
+                                        (item.vertexTL, item.vertexBL) = (item.vertexBL, item.vertexTL);
+                                        (item.vertexTR, item.vertexBR) = (item.vertexBR, item.vertexTR);
+                                    }
+                                }
 
                                 charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
                             }
@@ -417,11 +514,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private static unsafe void CalculateTextVectors(CustomSpriteFont font, int textLength, int lineCount,
             int* ptrGlyphIndex, CustomSpriteFont.Glyph* ptrGlyph, char* ptrText, Vector2* ptrLineOrigin,
             Vector2 parentPos, Vector2 pos, float sin, float cos, Vector2 sca, Vector2 pivot, TextAlignmentHorizontal alignment,
-            out Vector2 dirRight, out Vector2 dirUp, out Vector2 dirDown)
+            out Vector2 dirLeft, out Vector2 dirRight, out Vector2 dirUp, out Vector2 dirDown)
         {
             dirRight = (sca.X * Vector2.UnitX).RotateVector(sin, cos);
             dirUp = (sca.Y * Vector2.UnitY).RotateVector(sin, cos);
-            dirDown = -dirUp;
+            dirLeft = -dirRight; dirDown = -dirUp;
 
             var flagLines = true;
             var textSize = Vector2.Zero;
@@ -433,9 +530,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 switch (ptrText[i])
                 {
                     case '\n':
-                        counterLines++;
                         flagLines = true;
-                        textSize.Y += font.HeightSpacing;
+                        //textSize.Y += ptrLineOrigin[counterLines].Y;
+                        counterLines++;
                         ptrLineOrigin[counterLines] = Vector2.Zero;
                         continue;
                     case '\r':
@@ -460,26 +557,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (ptrLineOrigin[counterLines].X > textSize.X)
                     textSize.X = ptrLineOrigin[counterLines].X;
             }
+            //textSize.Y += ptrLineOrigin[counterLines].Y;
+            textSize.Y = font.HeightSpacing * lineCount;
 
             var posCounter = ptrLineOrigin[0].Y * dirUp;
+            var pivotOffset = dirDown * ((1f - pivot.Y) * 0.5f * textSize.Y) 
+                + dirLeft * ((pivot.X + 1f) * 0.5f * textSize.X);
+
             for (counterLines = 0; counterLines < lineCount; counterLines++)
             {
-                switch (alignment)
-                {
-                    case TextAlignmentHorizontal.Left:
-                        ptrLineOrigin[counterLines] = parentPos + pos + posCounter;
-                        break;
-                    case TextAlignmentHorizontal.Center:
-                        ptrLineOrigin[counterLines] = parentPos + pos + posCounter + (textSize.X - ptrLineOrigin[counterLines].X) / 2f * dirRight;
-                        break;
-                    case TextAlignmentHorizontal.Right:
-                        ptrLineOrigin[counterLines] = parentPos + pos + posCounter + (textSize.X - ptrLineOrigin[counterLines].X) * dirRight;
-                        break;
-                }
+                var alignmentOffset = alignment == TextAlignmentHorizontal.Left ? Vector2.Zero
+                    : alignment == TextAlignmentHorizontal.Center
+                    ? (textSize.X - ptrLineOrigin[counterLines].X) / 2f * dirRight
+                    : (textSize.X - ptrLineOrigin[counterLines].X) * dirRight;
+                ptrLineOrigin[counterLines] = parentPos + pos + posCounter + pivotOffset + alignmentOffset;
                 posCounter += font.HeightSpacing * dirUp;
             }
         }
-
 
         #region World Render Methods
         public void WorldRender(TextureView view, RenderObject transform) =>
@@ -618,7 +712,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
-            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
+            var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
             var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
 
             pos = parentPos + pos;
@@ -627,30 +721,5 @@ namespace Microsoft.Xna.Framework.Graphics
             TL = TL.RotateVector(pos, sin, cos);
             BR = BR.RotateVector(pos, sin, cos);
         }
-
-        /*private static void CalculateTextVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
-            out Vector2 origin, out Vector2 dirRight, out Vector2 dirDown)
-        {
-            pixelSize.GetBordersRectangleByPivot(pivot, out TL, out BR);
-
-            if (pixelSize.X < 0) (TL.X, BR.X) = (BR.X, TL.X);
-            if (pixelSize.Y < 0) (TL.Y, BR.Y) = (BR.Y, TL.Y);
-
-            if (rot == 0)
-            {
-                TR.X = BR.X; TR.Y = TL.Y;
-                BL.X = TL.X; BL.Y = BR.Y;
-                return;
-            }
-
-            var sin = MathF.Sin(rot * MathExtensions.Deg2Rad);
-            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
-
-            pos = parentPos + pos;
-            TR = MathExtensions.RotateVector(BR.X, TL.Y, pos, sin, cos);
-            BL = MathExtensions.RotateVector(TL.X, BR.Y, pos, sin, cos);
-            TL = TL.RotateVector(pos, sin, cos);
-            BR = BR.RotateVector(pos, sin, cos);
-        }*/
     }
 }
