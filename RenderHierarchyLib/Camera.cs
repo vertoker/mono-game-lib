@@ -13,6 +13,7 @@ namespace RenderHierarchyLib
         public Vector2 ScreenSize { get; private set; }
         public Vector2 HalfSize { get; private set; }
         public Vector2 AnchorCenter { get; private set; }
+        public Vector2 AnchorCenterInverse { get; private set; }
         public Vector2 AnchorX { get; private set; }
         public Vector2 AnchorY { get; private set; }
 
@@ -32,7 +33,8 @@ namespace RenderHierarchyLib
             var cos = MathF.Cos(Transform.Rot * MathExtensions.Deg2Rad);
             var pos = Transform.Pos.RotateVector(-Transform.Rot);
 
-            AnchorCenter = new Vector2(pos.X * -pixelScale, pos.Y * pixelScale) + HalfSize;
+            AnchorCenter = new Vector2(pos.X * pixelScale, pos.Y * pixelScale) + HalfSize;
+            AnchorCenterInverse = new Vector2(pos.X * -pixelScale, pos.Y * pixelScale) + HalfSize;
             AnchorX = MathExtensions.RotateVector(HalfSize.X, 0, sin, cos);
             AnchorY = MathExtensions.RotateVector(0, HalfSize.Y, sin, cos);
         }
@@ -45,12 +47,28 @@ namespace RenderHierarchyLib
                 Y = HalfSize.Y + HalfSize.Y * anchor.Y
             };
         }
+        public Vector2 GetAnchorPosCameraInverse(Vector2 anchor)
+        {
+            return new Vector2()
+            {
+                X = HalfSize.X + HalfSize.X * anchor.X,
+                Y = HalfSize.Y - HalfSize.Y * anchor.Y
+            };
+        }
         public Vector2 GetAnchorPosWorld(Vector2 anchor)
         {
             return new Vector2()
             {
                 X = AnchorCenter.X + AnchorX.X * anchor.X + AnchorY.X * anchor.Y,
                 Y = AnchorCenter.Y + AnchorX.Y * anchor.X + AnchorY.Y * anchor.Y
+            };
+        }
+        public Vector2 GetAnchorPosWorldInverse(Vector2 anchor)
+        {
+            return new Vector2()
+            {
+                X = AnchorCenterInverse.X + AnchorX.X * anchor.X + AnchorY.X * anchor.Y,
+                Y = AnchorCenterInverse.Y + AnchorX.Y * anchor.X + AnchorY.Y * anchor.Y
             };
         }
 

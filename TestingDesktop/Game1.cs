@@ -89,7 +89,7 @@ namespace TestingDesktop
             if (single) return;
             //single = true;
 
-            var text = "test1\ntest12\ntest123";
+            var text = "test 1\ntest 12\ntest 123";
 
             _spriteBatch.Begin();
 
@@ -104,10 +104,12 @@ namespace TestingDesktop
             _hierarchySpriteBatch.DrawString(_font1.Font, text, new Vector2(200, 200), Color.Yellow,//Tes\rt \n textfghfhfhghfgh
                 counter * MathExtensions.Deg2Rad, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
 
-            //_hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(200, 200), 0,
-            //    Vector2.One, Vector2.Zero, Vector2.Zero, 0, TextAlignmentHorizontal.Center);
+            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(200, 200), 0,
+                Vector2.One, AnchorPresets.LeftTop, AnchorPresets.LeftTop, 0, TextAlignmentHorizontal.Left);
 
             _hierarchySpriteBatch.End();
+
+            //throw new Exception();
         }
         private void Render(GameTime gameTime)
         {

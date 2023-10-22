@@ -185,8 +185,6 @@ namespace RenderHierarchyLib.Models.Text
             var length = text.Length;
             glyphIndexes.Clear();
             glyphIndexes.EnsureCapacity(length);
-            Debug.WriteLine(length);
-            Debug.WriteLine(glyphIndexes.Size);
             lines = 1;
 
             fixed (char* ptrChar = text)
