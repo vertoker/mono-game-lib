@@ -180,29 +180,25 @@ namespace RenderHierarchyLib.Models.Text
             return dictionary;
         }
 
-        public unsafe void SetGlyphIndexes(ref string text, UnsafeList<int> glyphIndexes, out int lines)
+        public unsafe void SetGlyphIndexes(char* ptrText, int textLength, UnsafeList<int> glyphIndexes, out int lines)
         {
-            var length = text.Length;
             glyphIndexes.Clear();
-            glyphIndexes.EnsureCapacity(length);
+            glyphIndexes.EnsureCapacity(textLength);
             lines = 1;
 
-            fixed (char* ptrChar = text)
+            fixed (int* ptrGlyphIndex = glyphIndexes.Items)
             {
-                fixed (int* ptrGlyphIndex = glyphIndexes.Items)
+                fixed (CharacterRegion* ptrRegion = _regions)
                 {
-                    fixed (CharacterRegion* ptrRegion = _regions)
+                    for (int i = 0; i < textLength; i++)
                     {
-                        for (int i = 0; i < length; i++)
-                        {
-                            GetGlyphIndex(ref ptrChar[i], ptrRegion, ref ptrGlyphIndex[i]);
-                            if (ptrChar[i] == '\n') lines++;
-                        }
+                        GetGlyphIndex(ref ptrText[i], ptrRegion, ref ptrGlyphIndex[i]);
+                        if (ptrText[i] == '\n') lines++;
                     }
                 }
             }
 
-            glyphIndexes.Size = length;
+            glyphIndexes.Size = textLength;
         }
 
         public unsafe void MeasureString(string text, out Vector2 size)

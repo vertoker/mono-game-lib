@@ -89,7 +89,11 @@ namespace TestingDesktop
             if (single) return;
             //single = true;
 
-            var text = "test123\ntest12\ntest1";
+            var text = "t'gG";
+
+            //var richText = new RichTextParser("That's white, \n{{#ff0000}}that's red, \n{{#000000}}that's black \n{{}}and go to default");
+
+            //Debug.WriteLine(richText.Text);
 
             _spriteBatch.Begin();
 
@@ -101,7 +105,10 @@ namespace TestingDesktop
             _hierarchySpriteBatch.Begin();
             //_hierarchySpriteBatch.RenderTextTest(_font1.Font, "Tes\rt \n textfghfhfhghfgh");
 
-            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, null, new Vector2(0, 0), counter,
+            //_hierarchySpriteBatch.CameraRichTextRender(_font1.Font, richText, new Vector2(0, 0), 0,
+            //    new Vector2(1, 1), AnchorPresets.CenterMiddle, AnchorPresets.CenterMiddle, 0, TextAlignmentHorizontal.Center);
+
+            _hierarchySpriteBatch.CameraTextRender(_font1.Font, text, Color.Red, new Vector2(0, 0), 0,
                 new Vector2(1, 1), AnchorPresets.CenterMiddle, AnchorPresets.CenterTop, 0, TextAlignmentHorizontal.Center);
 
             _hierarchySpriteBatch.End();

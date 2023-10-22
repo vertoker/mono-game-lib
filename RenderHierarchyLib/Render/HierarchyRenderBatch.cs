@@ -100,7 +100,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public void RenderTextTest(CustomSpriteFont font, string text)
         {
             if (CheckErrorText(font, text)) return;
-            font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
             DrawString(font, text, new Vector2(200, 200), Color.Yellow,//Tes\rt \n textfghfhfhghfgh
                 0, new Vector2(1, 1), new Vector2(1, 1), SpriteEffects.None, 1);
         }
@@ -335,26 +334,27 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Camera Text Render Methods
         #endregion
 
-        public unsafe void CameraRichTextRender(CustomSpriteFont font, string text, Color color,
+        public unsafe void CameraRichTextRender(CustomSpriteFont font, RichTextParser richText,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
-            if (CheckErrorText(font, text)) return;
-            font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
-            _lineOrigins.EnsureCapacity(lines);
-
-            var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
-            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
-
-            var flagNegativeX = sca.X < 0;
-            var flagNegativeY = sca.Y < 0;
-
-            fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
+            if (CheckErrorText(font, richText.Text)) return;
+            fixed (char* ptrText = richText.Text)
             {
-                fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
+                font.SetGlyphIndexes(ptrText, richText.Text.Length, _glyphIndexes, out var lines);
+
+                _lineOrigins.EnsureCapacity(lines);
+
+                var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
+                var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+                var flagNegativeX = sca.X < 0;
+                var flagNegativeY = sca.Y < 0;
+
+                fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
                 {
-                    fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
+                    fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
                     {
-                        fixed (char* ptrText = text)
+                        fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
@@ -364,6 +364,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             var flagLines = true;
                             var counterLines = 0;
                             var charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                            var currentColor = richText.DefaultColor;
                             for (int i = 0; i < _glyphIndexes.Size; i++)
                             {
                                 if (ptrText[i] == '\n')
@@ -394,12 +395,16 @@ namespace Microsoft.Xna.Framework.Graphics
                                 else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
                                 var upHeight = dirDown * rect.Height;
 
-                                item.vertexTL.Setup(charOrigin.Plus(upHeight), color, new Vector2(left, top));
-                                item.vertexBL.Setup(charOrigin, color, new Vector2(left, bottom));
+                                if (richText.Colors.TryGetValue(i, out var nextColor)) 
+                                { 
+                                    currentColor = nextColor;
+                                }
+                                item.vertexTL.Setup(charOrigin.Plus(upHeight), currentColor, new Vector2(left, top));
+                                item.vertexBL.Setup(charOrigin, currentColor, new Vector2(left, bottom));
 
                                 charOrigin = charOrigin.Plus(dirRight * rect.Width);
-                                item.vertexTR.Setup(charOrigin.Plus(upHeight), color, new Vector2(right, top));
-                                item.vertexBR.Setup(charOrigin, color, new Vector2(right, bottom));
+                                item.vertexTR.Setup(charOrigin.Plus(upHeight), currentColor, new Vector2(right, top));
+                                item.vertexBR.Setup(charOrigin, currentColor, new Vector2(right, bottom));
 
                                 if (flagNegativeX ^ flagNegativeY)
                                 {
@@ -427,22 +432,22 @@ namespace Microsoft.Xna.Framework.Graphics
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
         {
             if (CheckErrorText(font, text)) return;
-            font.SetGlyphIndexes(ref text, _glyphIndexes, out var lines);
-            _lineOrigins.EnsureCapacity(lines);
-
-            var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
-            var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
-
-            var flagNegativeX = sca.X < 0;
-            var flagNegativeY = sca.Y < 0;
-
-            fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
+            fixed (char* ptrText = text)
             {
-                fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
+                font.SetGlyphIndexes(ptrText, text.Length, _glyphIndexes, out var lines);
+                _lineOrigins.EnsureCapacity(lines);
+
+                var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
+                var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+                var flagNegativeX = sca.X < 0;
+                var flagNegativeY = sca.Y < 0;
+
+                fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
                 {
-                    fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
+                    fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
                     {
-                        fixed (char* ptrText = text)
+                        fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
