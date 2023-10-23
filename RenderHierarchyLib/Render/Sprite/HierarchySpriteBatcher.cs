@@ -9,12 +9,6 @@ namespace RenderHierarchyLib.Render.Sprite
 {
     public class HierarchySpriteBatcher
     {
-        private const int InitialBatchSize = 256;
-
-        private const int MaxBatchSize = 5461;
-
-        private const int InitialVertexArraySize = 256;
-
         private HierarchySpriteBatchItem[] _batchItemList;
 
         private int _batchItemCount;

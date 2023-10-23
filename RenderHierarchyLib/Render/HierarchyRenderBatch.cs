@@ -11,6 +11,7 @@ using System.Drawing;
 using RenderHierarchyLib.Extensions.MonoGame;
 using System.Diagnostics;
 using System.Net.Http.Headers;
+using RenderHierarchyLib.Render;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -31,20 +32,28 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly UnsafeList<Vector2> _lineOrigins;
 
         private bool _beginCalled;
+        private bool _autoReloadBatching = true;
+        private int _batchCounter = 0;
+        private int _batchMaxSize = 5000;
+
         private float _pixelScale;
         private Vector2 _posPixelScale;
 
-        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, int spriteCapacity = 256, int glyphIndexesCapacity = 16, int lineOriginsCapacity = 4)
+        public HierarchyRenderBatch(GraphicsDevice graphicsDevice, Camera camera, HierarchyRenderBatchPreset preset = null)
         {
             GraphicsDevice = graphicsDevice ?? 
                 throw new ArgumentNullException("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
+            preset ??= HierarchyRenderBatchPreset.Default;
             _camera = camera;
+
+            _autoReloadBatching = preset.autoReloadBatching;
+            _batchMaxSize = preset.batchMaxSize;
 
             _spriteEffect = new SpriteEffect(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
-            _batcher = new HierarchySpriteBatcher(graphicsDevice, spriteCapacity);
-            _glyphIndexes = new UnsafeList<int>(glyphIndexesCapacity);
-            _lineOrigins = new UnsafeList<Vector2>(lineOriginsCapacity);
+            _batcher = new HierarchySpriteBatcher(graphicsDevice, preset.spriteCapacity);
+            _glyphIndexes = new UnsafeList<int>(preset.glyphIndexesCapacity);
+            _lineOrigins = new UnsafeList<Vector2>(preset.lineOriginsCapacity);
         }
 
         public void Begin(BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
@@ -61,6 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _posPixelScale = new(_pixelScale, -_pixelScale);
             _camera.UpdateAnchors(_pixelScale);
 
+            _batchCounter = 0;
             _beginCalled = true;
         }
         public void End()
@@ -77,6 +87,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _batcher.DrawBatch();
             _beginCalled = false;
+        }
+
+        public void Reload()
+        {
+            if (!_beginCalled)
+                throw new InvalidOperationException("Reload must be called before calling End.");
+            End();
+            Begin();
+        }
+
+        public void TryReload()
+        {
+            if (!_autoReloadBatching)
+                return;
+            _batchCounter++;
+            if (_batchCounter >= _batchMaxSize)
+                Reload();
         }
 
         private bool CheckErrorSprite(Texture2D texture)
@@ -148,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private Vector2 _texCoordTL;
         private Vector2 _texCoordBR;
-        private unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+        public unsafe void DrawString(CustomSpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
             if (CheckErrorText(spriteFont, text)) return;
 
@@ -331,8 +358,245 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         #endregion
 
-        #region Camera Text Render Methods
+        #region World Rich Text Render Methods
+        public void WorldRichTextRender(CustomSpriteFont font, RichTextParser richText, RenderObject transform) =>
+            WorldRichTextRender(font, richText,
+                transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
+        public void WorldRichTextRender(CustomSpriteFont font, RichTextParser richText, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
+            WorldRichTextRender(font, richText,
+                transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
+        public void WorldRichTextRender(CustomSpriteFont font, RichTextParser richText, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
+            WorldRichTextRender(font, richText,
+                pos, rot, sca, anchor, pivot, depth);
         #endregion
+
+        #region World Text Render Methods
+        public void WorldTextRender(CustomSpriteFont font, string text, Color color, RenderObject transform) =>
+            WorldTextRender(font, text, color,
+                transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
+        public void WorldTextRender(CustomSpriteFont font, string text, Color color, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
+            WorldTextRender(font, text, color,
+                transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
+        public void WorldTextRender(CustomSpriteFont font, string text, Color color, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
+            WorldTextRender(font, text, color,
+                pos, rot, sca, anchor, pivot, depth);
+        #endregion
+
+        #region Camera Rich Text Render Methods
+        public void CameraRichTextRender(CustomSpriteFont font, RichTextParser richText, RenderObject transform) =>
+            CameraRichTextRender(font, richText,
+                transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
+        public void CameraRichTextRender(CustomSpriteFont font, RichTextParser richText, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
+            CameraRichTextRender(font, richText,
+                transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
+        public void CameraRichTextRender(CustomSpriteFont font, RichTextParser richText, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
+            CameraRichTextRender(font, richText,
+                pos, rot, sca, anchor, pivot, depth);
+        #endregion
+
+        #region Camera Text Render Methods
+        public void CameraTextRender(CustomSpriteFont font, string text, Color color, RenderObject transform) =>
+            CameraTextRender(font, text, color,
+                transform.Pos, transform.Rot, transform.Sca, transform.Anchor, transform.Pivot, transform.Depth);
+        public void CameraTextRender(CustomSpriteFont font, string text, Color color, TransformObject transform, Vector2 anchor, Vector2 pivot, int depth) =>
+            CameraTextRender(font, text, color,
+                transform.Pos, transform.Rot, transform.Sca, anchor, pivot, depth);
+        public void CameraTextRender(CustomSpriteFont font, string text, Color color, Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth) =>
+            CameraTextRender(font, text, color,
+                pos, rot, sca, anchor, pivot, depth);
+        #endregion
+
+        public unsafe void WorldRichTextRender(CustomSpriteFont font, RichTextParser richText,
+            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
+        {
+            if (CheckErrorText(font, richText.Text)) return;
+            fixed (char* ptrText = richText.Text)
+            {
+                font.SetGlyphIndexes(ptrText, richText.Text.Length, _glyphIndexes, out var lines);
+
+                _lineOrigins.EnsureCapacity(lines);
+
+                rot -= _camera.Transform.Rot;
+                var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
+                var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+                var flagNegativeX = sca.X < 0;
+                var flagNegativeY = sca.Y < 0;
+
+                fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
+                {
+                    fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
+                    {
+                        fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
+                        {
+                            CalculateTextVectors(font, _glyphIndexes.Size, lines,
+                                ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
+                                _camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
+
+                            var flagLines = true;
+                            var counterLines = 0;
+                            var charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                            var currentColor = richText.DefaultColor;
+                            for (int i = 0; i < _glyphIndexes.Size; i++)
+                            {
+                                if (ptrText[i] == '\n')
+                                {
+                                    flagLines = true;
+                                    counterLines++;
+                                    charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                                    continue;
+                                }
+                                else if (ptrText[i] == '\r')
+                                {
+                                    continue;
+                                }
+
+                                var glyph = ptrGlyph[ptrGlyphIndex[i]];
+                                var item = CreateBatchItem();
+                                var rect = glyph.BoundsInTexture;
+
+                                var left = rect.Left * font.TextureTexel.X;
+                                var right = rect.Right * font.TextureTexel.X;
+                                var top = rect.Top * font.TextureTexel.Y;
+                                var bottom = rect.Bottom * font.TextureTexel.Y;
+
+                                item.Texture = font.Texture;
+                                item.SortKey = depth;
+
+                                if (flagLines) flagLines = false;
+                                else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
+
+                                var upHeight = dirDown * (font.HeightSpacing - glyph.Cropping.Y);
+                                var downHeight = dirUp * (glyph.BoundsInTexture.Height + glyph.Cropping.Y - font.HeightSpacing);
+
+                                if (richText.Colors.TryGetValue(i, out var nextColor))
+                                {
+                                    currentColor = nextColor;
+                                }
+                                item.vertexTL.Setup(charOrigin.Plus(upHeight), currentColor, new Vector2(left, top));
+                                item.vertexBL.Setup(charOrigin.Plus(downHeight), currentColor, new Vector2(left, bottom));
+
+                                charOrigin = charOrigin.Plus(dirRight * rect.Width);
+                                item.vertexTR.Setup(charOrigin.Plus(upHeight), currentColor, new Vector2(right, top));
+                                item.vertexBR.Setup(charOrigin.Plus(downHeight), currentColor, new Vector2(right, bottom));
+
+                                if (flagNegativeX ^ flagNegativeY)
+                                {
+                                    if (flagNegativeX)
+                                    {
+                                        (item.vertexTL, item.vertexTR) = (item.vertexTR, item.vertexTL);
+                                        (item.vertexBL, item.vertexBR) = (item.vertexBR, item.vertexBL);
+                                    }
+                                    else
+                                    {
+                                        (item.vertexTL, item.vertexBL) = (item.vertexBL, item.vertexTL);
+                                        (item.vertexTR, item.vertexBR) = (item.vertexBR, item.vertexTR);
+                                    }
+                                }
+
+                                charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
+
+                                TryReload();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public unsafe void WorldTextRender(CustomSpriteFont font, string text, Color color,
+            Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
+        {
+            if (CheckErrorText(font, text)) return;
+            fixed (char* ptrText = text)
+            {
+                font.SetGlyphIndexes(ptrText, text.Length, _glyphIndexes, out var lines);
+                _lineOrigins.EnsureCapacity(lines);
+
+                rot -= _camera.Transform.Rot;
+                var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
+                var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
+
+                var flagNegativeX = sca.X < 0;
+                var flagNegativeY = sca.Y < 0;
+
+                fixed (int* ptrGlyphIndex = _glyphIndexes.Items)
+                {
+                    fixed (CustomSpriteFont.Glyph* ptrGlyph = font.Glyphs)
+                    {
+                        fixed (Vector2* ptrLineOrigin = _lineOrigins.Items)
+                        {
+                            CalculateTextVectors(font, _glyphIndexes.Size, lines,
+                                ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
+                                _camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
+
+                            var flagLines = true;
+                            var counterLines = 0;
+                            var charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                            for (int i = 0; i < _glyphIndexes.Size; i++)
+                            {
+                                if (ptrText[i] == '\n')
+                                {
+                                    flagLines = true;
+                                    counterLines++;
+                                    charOrigin = new Vector3(ptrLineOrigin[counterLines], depth);
+                                    continue;
+                                }
+                                else if (ptrText[i] == '\r')
+                                {
+                                    continue;
+                                }
+
+                                var glyph = ptrGlyph[ptrGlyphIndex[i]];
+                                var item = CreateBatchItem();
+                                var rect = glyph.BoundsInTexture;
+
+                                var left = rect.Left * font.TextureTexel.X;
+                                var right = rect.Right * font.TextureTexel.X;
+                                var top = rect.Top * font.TextureTexel.Y;
+                                var bottom = rect.Bottom * font.TextureTexel.Y;
+
+                                item.Texture = font.Texture;
+                                item.SortKey = depth;
+
+                                if (flagLines) flagLines = false;
+                                else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
+
+                                var upHeight = dirDown * (font.HeightSpacing - glyph.Cropping.Y);
+                                var downHeight = dirUp * (glyph.BoundsInTexture.Height + glyph.Cropping.Y - font.HeightSpacing);
+
+                                item.vertexTL.Setup(charOrigin.Plus(upHeight), color, new Vector2(left, top));
+                                item.vertexBL.Setup(charOrigin.Plus(downHeight), color, new Vector2(left, bottom));
+
+                                charOrigin = charOrigin.Plus(dirRight * rect.Width);
+                                item.vertexTR.Setup(charOrigin.Plus(upHeight), color, new Vector2(right, top));
+                                item.vertexBR.Setup(charOrigin.Plus(downHeight), color, new Vector2(right, bottom));
+
+                                if (flagNegativeX ^ flagNegativeY)
+                                {
+                                    if (flagNegativeX)
+                                    {
+                                        (item.vertexTL, item.vertexTR) = (item.vertexTR, item.vertexTL);
+                                        (item.vertexBL, item.vertexBR) = (item.vertexBR, item.vertexBL);
+                                    }
+                                    else
+                                    {
+                                        (item.vertexTL, item.vertexBL) = (item.vertexBL, item.vertexTL);
+                                        (item.vertexTR, item.vertexBR) = (item.vertexBR, item.vertexTR);
+                                    }
+                                }
+
+                                charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
+
+                                TryReload();
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         public unsafe void CameraRichTextRender(CustomSpriteFont font, RichTextParser richText,
             Vector2 pos, float rot, Vector2 sca, Vector2 anchor, Vector2 pivot, int depth, TextAlignmentHorizontal alignment)
@@ -393,18 +657,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
                                 if (flagLines) flagLines = false;
                                 else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
-                                var upHeight = dirDown * rect.Height;
+
+                                var upHeight = dirDown * (font.HeightSpacing - glyph.Cropping.Y);
+                                var downHeight = dirUp * (glyph.BoundsInTexture.Height + glyph.Cropping.Y - font.HeightSpacing);
 
                                 if (richText.Colors.TryGetValue(i, out var nextColor)) 
                                 { 
                                     currentColor = nextColor;
                                 }
                                 item.vertexTL.Setup(charOrigin.Plus(upHeight), currentColor, new Vector2(left, top));
-                                item.vertexBL.Setup(charOrigin, currentColor, new Vector2(left, bottom));
+                                item.vertexBL.Setup(charOrigin.Plus(downHeight), currentColor, new Vector2(left, bottom));
 
                                 charOrigin = charOrigin.Plus(dirRight * rect.Width);
                                 item.vertexTR.Setup(charOrigin.Plus(upHeight), currentColor, new Vector2(right, top));
-                                item.vertexBR.Setup(charOrigin, currentColor, new Vector2(right, bottom));
+                                item.vertexBR.Setup(charOrigin.Plus(downHeight), currentColor, new Vector2(right, bottom));
 
                                 if (flagNegativeX ^ flagNegativeY)
                                 {
@@ -421,6 +687,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                 }
 
                                 charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
+
+                                TryReload();
                             }
                         }
                     }
@@ -485,14 +753,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
                                 if (flagLines) flagLines = false;
                                 else charOrigin = charOrigin.Plus(dirRight * glyph.LeftBearing);
-                                var upHeight = dirDown * rect.Height;
+
+                                var upHeight = dirDown * (font.HeightSpacing - glyph.Cropping.Y);
+                                var downHeight = dirUp * (glyph.BoundsInTexture.Height + glyph.Cropping.Y - font.HeightSpacing);
 
                                 item.vertexTL.Setup(charOrigin.Plus(upHeight), color, new Vector2(left, top));
-                                item.vertexBL.Setup(charOrigin, color, new Vector2(left, bottom));
+                                item.vertexBL.Setup(charOrigin.Plus(downHeight), color, new Vector2(left, bottom));
 
                                 charOrigin = charOrigin.Plus(dirRight * rect.Width);
                                 item.vertexTR.Setup(charOrigin.Plus(upHeight), color, new Vector2(right, top));
-                                item.vertexBR.Setup(charOrigin, color, new Vector2(right, bottom));
+                                item.vertexBR.Setup(charOrigin.Plus(downHeight), color, new Vector2(right, bottom));
 
                                 if (flagNegativeX ^ flagNegativeY)
                                 {
@@ -509,6 +779,8 @@ namespace Microsoft.Xna.Framework.Graphics
                                 }
 
                                 charOrigin = charOrigin.Plus(dirRight * (glyph.RightBearing + font.WidthSpacing));
+
+                                TryReload();
                             }
                         }
                     }
@@ -669,7 +941,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateVertexes(_camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, rot + _camera.Transform.Rot,
+            CalculateVertexes(_camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, rot + _camera.Transform.Rot,
                 sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
@@ -679,6 +951,8 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.vertexTR.Setup(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
             spriteBatchItem.vertexBL.Setup(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
             spriteBatchItem.vertexBR.Setup(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
+
+            TryReload();
         }
 
         public void CameraRender(Texture2D texture, Color color, Vector2 viewStart, Vector2 viewEnd,
@@ -690,7 +964,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateVertexes(_camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, rot,
+            CalculateVertexes(_camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, rot,
                 sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
@@ -700,6 +974,8 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.vertexTR.Setup(new Vector3(TR.X, TR.Y, depth), color, new Vector2(viewEnd.X, viewStart.Y));
             spriteBatchItem.vertexBL.Setup(new Vector3(BL.X, BL.Y, depth), color, new Vector2(viewStart.X, viewEnd.Y));
             spriteBatchItem.vertexBR.Setup(new Vector3(BR.X, BR.Y, depth), color, viewEnd);
+
+            TryReload();
         }
 
         private static void CalculateVertexes(Vector2 parentPos, Vector2 pos, float rot, Vector2 pixelSize, Vector2 pivot,
