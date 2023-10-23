@@ -8,6 +8,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SceneLib\SceneLib\SceneLib.csproj" />
+    <ProjectReference Include="..\..\RenderHierarchyLib\RenderHierarchyLib\RenderHierarchyLib.csproj" />
   </ItemGroup>
 </Project>

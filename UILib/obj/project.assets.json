@@ -48,14 +48,14 @@
           }
         }
       },
-      "SceneLib/1.0.0": {
+      "RenderHierarchyLib/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "compile": {
-          "bin/placeholder/SceneLib.dll": {}
+          "bin/placeholder/RenderHierarchyLib.dll": {}
         },
         "runtime": {
-          "bin/placeholder/SceneLib.dll": {}
+          "bin/placeholder/RenderHierarchyLib.dll": {}
         }
       }
     }
@@ -83,16 +83,16 @@
         "runtimes/win-x86/native/soft_oal.dll"
       ]
     },
-    "SceneLib/1.0.0": {
+    "RenderHierarchyLib/1.0.0": {
       "type": "project",
-      "path": "../../SceneLib/SceneLib/SceneLib.csproj",
-      "msbuildProject": "../../SceneLib/SceneLib/SceneLib.csproj"
+      "path": "../../RenderHierarchyLib/RenderHierarchyLib/RenderHierarchyLib.csproj",
+      "msbuildProject": "../../RenderHierarchyLib/RenderHierarchyLib/RenderHierarchyLib.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
       "MonoGame.Framework.DesktopGL >= 3.8.1.303",
-      "SceneLib >= 1.0.0"
+      "RenderHierarchyLib >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -128,8 +128,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj": {
-              "projectPath": "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj"
+            "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj": {
+              "projectPath": "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj"
             }
           }
         }

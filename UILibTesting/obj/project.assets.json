@@ -55,21 +55,21 @@
           }
         }
       },
-      "SceneLib/1.0.0": {
+      "RenderHierarchyLib/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "compile": {
-          "bin/placeholder/SceneLib.dll": {}
+          "bin/placeholder/RenderHierarchyLib.dll": {}
         },
         "runtime": {
-          "bin/placeholder/SceneLib.dll": {}
+          "bin/placeholder/RenderHierarchyLib.dll": {}
         }
       },
       "UILib/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "SceneLib": "1.0.0"
+          "RenderHierarchyLib": "1.0.0"
         },
         "compile": {
           "bin/placeholder/UILib.dll": {}
@@ -117,10 +117,10 @@
         "runtimes/win-x86/native/soft_oal.dll"
       ]
     },
-    "SceneLib/1.0.0": {
+    "RenderHierarchyLib/1.0.0": {
       "type": "project",
-      "path": "../../SceneLib/SceneLib/SceneLib.csproj",
-      "msbuildProject": "../../SceneLib/SceneLib/SceneLib.csproj"
+      "path": "../../RenderHierarchyLib/RenderHierarchyLib/RenderHierarchyLib.csproj",
+      "msbuildProject": "../../RenderHierarchyLib/RenderHierarchyLib/RenderHierarchyLib.csproj"
     },
     "UILib/1.0.0": {
       "type": "project",
@@ -132,7 +132,7 @@
     "net6.0": [
       "MonoGame.Content.Builder.Task >= 3.8.1.303",
       "MonoGame.Framework.DesktopGL >= 3.8.1.303",
-      "SceneLib >= 1.0.0",
+      "RenderHierarchyLib >= 1.0.0",
       "UILib >= 1.0.0"
     ]
   },
@@ -169,8 +169,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj": {
-              "projectPath": "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj"
+            "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj": {
+              "projectPath": "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj"
             },
             "E:\\Projects\\Monogame\\UILib\\UILib\\UILib.csproj": {
               "projectPath": "E:\\Projects\\Monogame\\UILib\\UILib\\UILib.csproj"

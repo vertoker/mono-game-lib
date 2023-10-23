@@ -4,14 +4,14 @@
     "E:\\Projects\\Monogame\\UILib\\UILib\\UILib.csproj": {}
   },
   "projects": {
-    "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj": {
+    "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj",
-        "projectName": "SceneLib",
-        "projectPath": "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj",
+        "projectUniqueName": "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj",
+        "projectName": "RenderHierarchyLib",
+        "projectPath": "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj",
         "packagesPath": "C:\\Users\\vertog\\.nuget\\packages\\",
-        "outputPath": "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\obj\\",
+        "outputPath": "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDE\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -100,8 +100,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj": {
-                "projectPath": "E:\\Projects\\Monogame\\SceneLib\\SceneLib\\SceneLib.csproj"
+              "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj": {
+                "projectPath": "E:\\Projects\\Monogame\\RenderHierarchyLib\\RenderHierarchyLib\\RenderHierarchyLib.csproj"
               }
             }
           }

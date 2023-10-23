@@ -1,4 +1,4 @@
-﻿using SceneLib.Core;
+﻿using UILibTesting;
 
-using var game = new SceneGame(null);
+using var game = new Game1();
 game.Run();
