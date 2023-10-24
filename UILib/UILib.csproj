@@ -10,4 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\RenderHierarchyLib\RenderHierarchyLib\RenderHierarchyLib.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Input\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
 </Project>
