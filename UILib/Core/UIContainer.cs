@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,25 +8,10 @@ using UILib.Interfaces.Core;
 
 namespace UILib.Core
 {
-    public class UIContainer : IElementParent
+    public class UIContainer : UIElement
     {
-        private readonly List<IElementChild> _childrens = new();
-
-        public IReadOnlyList<IElementChild> Childs => _childrens;
-
-        public void AddChild(IElementChild element)
-        {
-            _childrens.Add(element);
-            element.SetActiveInHierarchy(true);
-        }
-        public void RemoveChild(IElementChild element)
-        {
-            _childrens.Remove(element);
-            element.SetActiveInHierarchy(false);
-        }
-
-        public bool IsChild() => false;
-        public bool IsChild(out IElementChild child)
+        public override bool IsChild() => false;
+        public override bool IsChild(out IElementChild child)
         {
             child = null;
             return false;

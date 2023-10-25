@@ -11,9 +11,10 @@ namespace UILib.Interfaces.Core
     {
         public bool IsActive { get; }
         public bool IsActiveInHierarchy { get; }
-        public bool IsEnabled { get; }
+        public IElementParent Parent { get; }
         public void SetActive(bool active);
-        public void SetActiveInHierarchy(bool active);
+
+        public void SetOrderInParent(int index);
 
         public abstract void Enable();
         public abstract void Disable();
