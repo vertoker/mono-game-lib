@@ -10,6 +10,11 @@ namespace UILib.Core
 {
     public class UIContainer : UIElement
     {
+        public UIContainer(UI ui)
+        {
+            UI = ui;
+        }
+
         public override bool IsChild() => false;
         public override bool IsChild(out IElementChild child)
         {

@@ -10,7 +10,7 @@ namespace UILib.Interfaces.Core
 {
     public interface IElementParent
     {
-        public IReadOnlyList<UIElement> Childs { get; }
+        public IReadOnlyList<UIElement> Childen { get; }
 
         public void AddChild(UIElement element);
         public void RemoveChild(UIElement element);
