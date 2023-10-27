@@ -43,7 +43,7 @@ namespace UILibTesting
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _image.Rotation = (float)gameTime.TotalGameTime.TotalSeconds * -5f;
+            _image.LocalRotation = (float)gameTime.TotalGameTime.TotalSeconds * -5f;
 
             _ui.Draw(gameTime);
 

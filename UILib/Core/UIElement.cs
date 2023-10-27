@@ -27,29 +27,40 @@ namespace UILib.Core
 
 
 
-        private bool _isDirty = false;
+        private bool _isDirty = true;
         public bool IsDirty => _isDirty;
+
+        private Vector2 _localPosition = Vector2.Zero;
+        private float _localRotation = 0f;
+        private Vector2 _localSize = Vector2.One;
+
+        private Vector2 _localPivot = AnchorPresets.CenterMiddle;
+        private Vector2 _localAnchor = PivotPresets.CenterMiddle;
+
+        public Vector2 LocalPosition { get { return _localPosition; } set { _localPosition = value; SetDirty(); } }
+        public float LocalRotation { get { return _localRotation; } set { _localRotation = value; SetDirty(); } }
+        public Vector2 LocalSize { get { return _localSize; } set { _localSize = value; SetDirty(); } }
+        public Vector2 LocalPivot { get { return _localPivot; } set { _localPivot = value; SetDirty(); } }
+        public Vector2 LocalAnchor { get { return _localAnchor; } set { _localAnchor = value; SetDirty(); } }
+
 
         private Vector2 _position = Vector2.Zero;
         private float _rotation = 0f;
         private Vector2 _size = Vector2.One;
 
-        public Vector2 Position { get { return _position; } set { _position = value; SetDirty(); } }
-        public float Rotation { get { return _rotation; } set { _rotation = value; SetDirty(); } }
-        public Vector2 Size { get { return _size; } set { _size = value; SetDirty(); } }
-
         private Vector2 _pivot = AnchorPresets.CenterMiddle;
         private Vector2 _anchor = PivotPresets.CenterMiddle;
 
-        public Vector2 Pivot { get { return _pivot; } set { _pivot = value; SetDirty(); } }
-        public Vector2 Anchor { get { return _anchor; } set { _anchor = value; SetDirty(); } }
+        public Vector2 Position => _position;
+        public float Rotation => _rotation;
+        public Vector2 Size => _size;
+        public Vector2 Pivot => _pivot;
+        public Vector2 Anchor => _anchor;
 
 
 
         private readonly List<UIElement> _children = new();
         public IReadOnlyList<UIElement> Childen => _children;
-
-
 
         public void SetActive(bool active)
         {
@@ -67,6 +78,11 @@ namespace UILib.Core
         public void SetDirty()
         {
             _isDirty = true;
+
+            var length = _children.Count;
+            if (length == 0) return;
+            for (int i = 0; i < length; i++)
+                _children[i].SetDirty();
         }
 
         public void SetOrderInParent(int index)
@@ -109,11 +125,7 @@ namespace UILib.Core
         {
             if (!_enabled) return;
 
-            if (_isDirty)
-            {
-                _isDirty = false;
-                UpdateRect();
-            }
+            UpdateRect();
 
             UpdateElement(time);
 
@@ -126,12 +138,6 @@ namespace UILib.Core
         {
             if (!_enabled) return;
 
-            if (_isDirty)
-            {
-                _isDirty = false;
-                UpdateRect();
-            }
-
             DrawElement(time);
 
             var length = _children.Count;
@@ -140,7 +146,37 @@ namespace UILib.Core
                 _children[i].Draw(time);
         }
 
-        public virtual void UpdateRect() { }
+        public void UpdateRect()
+        {
+            if (!_isDirty) return;
+            _isDirty = false;
+
+            _position = _localPosition;
+            _rotation = _localRotation;
+            _size = _localSize;
+            _anchor = _localAnchor;
+            _pivot = _localPivot;
+
+            UpdateChildrenRect();
+        }
+        private void UpdateRect(ref Vector2 parentPos, ref float parentRot, ref Vector2 parentSca, ref Vector2 parentAnchor, ref Vector2 parentPivot)
+        {
+            RenderObjectExtensions.SetParent(
+                ref _localPosition, ref _localRotation, ref _localSize, ref _localAnchor, ref _localPivot,
+                ref parentPos, ref parentRot, ref parentSca, ref parentAnchor, ref parentPivot,
+                ref _position, ref _rotation, ref _size, ref _anchor, ref _pivot);
+
+            UpdateChildrenRect();
+        }
+
+        private void UpdateChildrenRect()
+        {
+            var length = _children.Count;
+            if (length == 0) return;
+            for (int i = 0; i < length; i++)
+                _children[i].UpdateRect(ref _position, ref _rotation, ref _size, ref _anchor, ref _pivot);
+        }
+
         public virtual void UpdateElement(GameTime time) { }
         public virtual void DrawElement(GameTime time) { }
         public virtual void Enable() { }

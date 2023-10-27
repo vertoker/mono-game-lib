@@ -12,6 +12,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Input\" />
-    <Folder Include="Interfaces\Input\" />
   </ItemGroup>
 </Project>
