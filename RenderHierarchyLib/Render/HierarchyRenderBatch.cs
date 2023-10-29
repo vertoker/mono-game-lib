@@ -17,8 +17,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class HierarchyRenderBatch : CustomGraphicsResource
     {
-        private readonly HierarchySpriteBatcher _batcher;
-        private readonly Camera _camera;
+        public readonly HierarchySpriteBatcher Batcher;
+        public readonly Camera Camera;
 
         private BlendState _blendState;
         private SamplerState _samplerState;
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsDevice = camera.GraphicsManager.GraphicsDevice ?? 
                 throw new ArgumentNullException("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
             preset ??= HierarchyRenderBatchPreset.Default;
-            _camera = camera;
+            Camera = camera;
 
             _autoReloadBatching = preset.autoReloadBatching;
             _batchMaxSize = preset.batchMaxSize;
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _spriteEffect = new SpriteEffect(GraphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
-            _batcher = new HierarchySpriteBatcher(GraphicsDevice, preset.spriteCapacity);
+            Batcher = new HierarchySpriteBatcher(GraphicsDevice, preset.spriteCapacity);
             _glyphIndexes = new UnsafeList<int>(preset.glyphIndexesCapacity);
             _lineOrigins = new UnsafeList<Vector2>(preset.lineOriginsCapacity);
         }
@@ -68,9 +68,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilState = depthStencilState ?? DepthStencilState.None;
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
 
-            _pixelScale = _camera.PixelScale;
+            _pixelScale = Camera.PixelScale;
             _posPixelScale = new(_pixelScale, -_pixelScale);
-            _camera.UpdateAnchors(_pixelScale);
+            Camera.UpdateAnchors(_pixelScale);
 
             _batchCounter = 0;
             _beginCalled = true;
@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
             device.SamplerStates[0] = _samplerState;
             _spritePass.Apply();
 
-            _batcher.DrawBatch();
+            Batcher.DrawBatch();
             _beginCalled = false;
         }
 
@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return false;
         }
 
-        public HierarchySpriteBatchItem CreateBatchItem() => _batcher.CreateBatchItem();
+        public HierarchySpriteBatchItem CreateBatchItem() => Batcher.CreateBatchItem();
 
         #region World Rich Text Render Methods
         public void WorldRichTextRender(CustomSpriteFont font, RichTextParser richText, RenderText transform) =>
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _lineOrigins.EnsureCapacity(lines);
 
-                rot -= _camera.Transform.Rot;
+                rot -= Camera.Transform.Rot;
                 var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
                 var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
 
@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
-                                _camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                Camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
                                 out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
 
                             var flagLines = true;
@@ -272,7 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 font.SetGlyphIndexes(ptrText, text.Length, _glyphIndexes, out var lines);
                 _lineOrigins.EnsureCapacity(lines);
 
-                rot -= _camera.Transform.Rot;
+                rot -= Camera.Transform.Rot;
                 var sin = -MathF.Sin(rot * MathExtensions.Deg2Rad);
                 var cos = MathF.Cos(rot * MathExtensions.Deg2Rad);
 
@@ -287,7 +287,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
-                                _camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                Camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
                                 out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
 
                             var flagLines = true;
@@ -380,7 +380,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
-                                _camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                Camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
                                 out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
 
                             var flagLines = true;
@@ -477,7 +477,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             CalculateTextVectors(font, _glyphIndexes.Size, lines,
                                 ptrGlyphIndex, ptrGlyph, ptrText, ptrLineOrigin,
-                                _camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
+                                Camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, sin, cos, sca, pivot, alignment,
                                 out var dirLeft, out var dirRight, out var dirUp, out var dirDown);
 
                             var flagLines = true;
@@ -699,7 +699,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateVertexes(_camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, rot + _camera.Transform.Rot,
+            CalculateVertexes(Camera.GetAnchorPosWorldInverse(anchor), pos * _posPixelScale, rot + Camera.Transform.Rot,
                 sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
@@ -722,7 +722,7 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatchItem.Texture = texture;
             spriteBatchItem.SortKey = depth;
 
-            CalculateVertexes(_camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, rot,
+            CalculateVertexes(Camera.GetAnchorPosCameraInverse(anchor), pos * _posPixelScale, rot,
                 sca * _pixelScale, pivot, out var TL, out var TR, out var BL, out var BR);
 
             if (sca.X < 0) (viewStart.X, viewEnd.X) = (viewEnd.X, viewStart.X);
