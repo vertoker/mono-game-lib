@@ -2,36 +2,47 @@
 using Microsoft.Xna.Framework.Graphics;
 using RenderHierarchyLib;
 using RenderHierarchyLib.Models.Transform;
+using System.Xml.Linq;
 using UILib.Core;
 using UILib.Elements;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace UILibTesting
 {
     public class Game1 : Game
     {
         private GraphicsDeviceManager _manager;
+
+        private UI _ui;
         private Camera _camera;
 
-        private HierarchyRenderBatch _batch;
-        private UI _ui;
         private ImageElement _image;
+        private TextElement _text;
 
         public Game1()
         {
             _manager = new GraphicsDeviceManager(this);
-            _camera = new Camera(new TransformCamera(10), _manager);
             Content.RootDirectory = "Content";
         }
-        protected override void Initialize()
-        {
-            base.Initialize();
 
-            _batch = new HierarchyRenderBatch(_manager.GraphicsDevice, _camera);
-            _ui = new UI(_batch);
+        protected override void LoadContent()
+        {
+            base.LoadContent();
+
+            _camera = new Camera(10, _manager);
+            _ui = new UI(_camera, Content);
 
             var texture = Content.Load<Texture2D>("Test");
+            var font = Content.Load<SpriteFont>("RobotoFont");
+
             _image = new ImageElement(texture);
+            _text = new TextElement(font);
+
+            _image.Color = Color.Black;
+            _text.Text = "Test text";
+
             _ui.Container.AddChild(_image);
+            _ui.Container.AddChild(_text);
         }
         protected override void Update(GameTime gameTime)
         {

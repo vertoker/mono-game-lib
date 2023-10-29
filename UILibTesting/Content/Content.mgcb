@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin 01_Square.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:01_Square.png;Empty.png
+
 #begin 17_TriangleBoldOutline.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -23,5 +35,18 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:17_TriangleBoldOutline.png;Test.png
+/build:17_TriangleBoldOutline.png;Triangle.png
+
+#begin Roboto-Black.ttf
+/copy:Roboto-Black.ttf;Roboto.ttf
+
+#begin Roboto-Thin.ttf
+/copy:Roboto-Thin.ttf
+
+#begin RobotoFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=DxtCompressed
+/build:RobotoFont.spritefont
 
