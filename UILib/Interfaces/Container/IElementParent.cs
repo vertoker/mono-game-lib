@@ -16,8 +16,5 @@ namespace UILib.Interfaces.Core
         public void RemoveChild(UIElement element);
 
         public void SetOrder(UIElement element, int index);
-
-        public bool IsChild();
-        public bool IsChild(out IElementChild child);
     }
 }

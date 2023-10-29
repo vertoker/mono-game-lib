@@ -15,17 +15,25 @@ namespace UILib.Core
 {
     public abstract class UIElement : IElementChild, IElementRect, IElementParent, IUIUpdate, IUIDraw
     {
+        public string Name { get; set; }
         private bool _selfActive = true;
         private bool _cachedActive = true;
         private bool _enabled = false;
-        private IElementParent _parent;
+        private UIElement _parent;
         protected UI UI;
 
         public bool IsActive => _selfActive;
         public bool IsActiveInHierarchy => _cachedActive;
-        public IElementParent Parent => _parent;
+        public UIElement Parent => _parent;
 
-
+        public UIElement()
+        {
+            Name = GetType().UnderlyingSystemType.Name;
+        }
+        public UIElement(string name)
+        {
+            Name = name;
+        }
 
         private bool _isDirty = true;
         public bool IsDirty => _isDirty;
@@ -65,7 +73,16 @@ namespace UILib.Core
         public void SetActive(bool active)
         {
             _selfActive = active;
-            SetActiveInHierarchy(this.IsHierarchyActive());
+            SetActiveInHierarchy(IsHierarchyActive(this));
+        }
+        public static bool IsHierarchyActive(UIElement element)
+        {
+            while (element != null)
+            {
+                if (element.IsActiveInHierarchy) return true;
+                element = element.Parent;
+            }
+            return false;
         }
         private void SetActiveInHierarchy(bool active)
         {
@@ -151,13 +168,20 @@ namespace UILib.Core
             if (!_isDirty) return;
             _isDirty = false;
 
-            _position = _localPosition;
-            _rotation = _localRotation;
-            _size = _localSize;
-            _anchor = _localAnchor;
-            _pivot = _localPivot;
+            if (Parent != null)
+            {
+                UpdateRect(ref Parent._position, ref Parent._localRotation, ref Parent._localSize, ref Parent._localAnchor, ref Parent._localPivot);
+            }
+            else
+            {
+                _position = _localPosition;
+                _rotation = _localRotation;
+                _size = _localSize;
+                _anchor = _localAnchor;
+                _pivot = _localPivot;
 
-            UpdateChildrenRect();
+                UpdateChildrenRect();
+            }
         }
         private void UpdateRect(ref Vector2 parentPos, ref float parentRot, ref Vector2 parentSca, ref Vector2 parentAnchor, ref Vector2 parentPivot)
         {
@@ -197,21 +221,6 @@ namespace UILib.Core
             element.SetActive(false);
             element._parent = null;
             element.UI = null;
-        }
-
-
-
-        public virtual bool IsParent() => true;
-        public virtual bool IsParent(out IElementParent parent)
-        {
-            parent = this;
-            return true;
-        }
-        public virtual bool IsChild() => true;
-        public virtual bool IsChild(out IElementChild child)
-        {
-            child = this;
-            return true;
         }
     }
 }

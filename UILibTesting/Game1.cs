@@ -5,6 +5,8 @@ using RenderHierarchyLib.Models.Transform;
 using System.Xml.Linq;
 using UILib.Core;
 using UILib.Elements;
+using UILib.Extensions;
+using UILib.Modules;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace UILibTesting
@@ -32,8 +34,10 @@ namespace UILibTesting
             _camera = new Camera(10, _manager);
             _ui = new UI(_camera, Content);
 
-            var texture = Content.Load<Texture2D>("Test");
+            var texture = Content.Load<Texture2D>("Empty");
             var font = Content.Load<SpriteFont>("RobotoFont");
+
+            _ui.AddModule(new MouseInputModule(texture));
 
             _image = new ImageElement(texture);
             _text = new TextElement(font);
@@ -42,7 +46,7 @@ namespace UILibTesting
             _text.Text = "Test text";
 
             _ui.Container.AddChild(_image);
-            _ui.Container.AddChild(_text);
+            _image.AddChild(_text);
         }
         protected override void Update(GameTime gameTime)
         {

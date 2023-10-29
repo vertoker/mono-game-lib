@@ -14,12 +14,5 @@ namespace UILib.Core
         {
             UI = ui;
         }
-
-        public override bool IsChild() => false;
-        public override bool IsChild(out IElementChild child)
-        {
-            child = null;
-            return false;
-        }
     }
 }
