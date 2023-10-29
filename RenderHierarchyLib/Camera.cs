@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using RenderHierarchyLib.Extensions;
 using RenderHierarchyLib.Models.Transform;
 using System;
@@ -8,7 +9,7 @@ namespace RenderHierarchyLib
     public class Camera
     {
         public TransformCamera Transform;
-        public readonly GraphicsDeviceManager Graphics;
+        public readonly GraphicsDeviceManager GraphicsManager;
 
         public Vector2 ScreenSize { get; private set; }
         public Vector2 HalfSize { get; private set; }
@@ -17,10 +18,15 @@ namespace RenderHierarchyLib
         public Vector2 AnchorX { get; private set; }
         public Vector2 AnchorY { get; private set; }
 
-        public Camera(TransformCamera transform, GraphicsDeviceManager graphics)
+        public Camera(float pixelSca, GraphicsDeviceManager manager)
+        {
+            Transform = new TransformCamera(pixelSca);
+            GraphicsManager = manager;
+        }
+        public Camera(TransformCamera transform, GraphicsDeviceManager manager)
         {
             Transform = transform;
-            Graphics = graphics;
+            GraphicsManager = manager;
         }
 
         public void UpdateAnchors() => UpdateAnchors(PixelScale);
@@ -72,8 +78,8 @@ namespace RenderHierarchyLib
             };
         }
 
-        public int ScreenX => Graphics.PreferredBackBufferWidth;
-        public int ScreenY => Graphics.PreferredBackBufferHeight;
-        public float PixelScale => Graphics.PreferredBackBufferHeight / Transform.PixelSca;
+        public int ScreenX => GraphicsManager.PreferredBackBufferWidth;
+        public int ScreenY => GraphicsManager.PreferredBackBufferHeight;
+        public float PixelScale => GraphicsManager.PreferredBackBufferHeight / Transform.PixelSca;
     }
 }
