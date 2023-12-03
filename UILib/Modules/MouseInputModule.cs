@@ -39,10 +39,16 @@ namespace UILib.Modules
             var state = Mouse.GetState();
             //var pos = new Vector2(state.X, state.Y) / UI.Batch.Camera.GraphicsManager.PreferredBackBufferHeight * UI.Batch.Camera.PixelScale;
             var pos = new Vector2((float)time.TotalGameTime.TotalSeconds, 0);
-            Debug.WriteLine(pos);
-
-            UI.Batch.CameraRender(CursorTexture, Color.Red, Vector2.Zero, Vector2.One, pos, 0, Vector2.One, 
+            //Debug.WriteLine(pos);
+            /*
+            UI.Batch.CameraRender(CursorTexture, Color.Blue, Vector2.Zero, Vector2.One,
+                new Vector2(2, 0), 0, Vector2.One, 
                 AnchorPresets.CenterMiddle, PivotPresets.CenterMiddle, (int)UI.DepthEnumerator.Current);
+            UI.DepthEnumerator.MoveNext();*/
+            // WTF
+            UI.Batch.CameraRender(CursorTexture, Color.Red, Vector2.Zero, Vector2.One,
+                pos, 0, Vector2.One, 
+                AnchorPresets.RightBottom, PivotPresets.CenterMiddle, 2);
             UI.DepthEnumerator.MoveNext();
         }
         public void Update(GameTime time)

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using RenderHierarchyLib;
 using RenderHierarchyLib.Models.Transform;
+using System;
 using System.Xml.Linq;
 using UILib.Core;
 using UILib.Elements;
@@ -37,16 +38,15 @@ namespace UILibTesting
             var texture = Content.Load<Texture2D>("Empty");
             var font = Content.Load<SpriteFont>("RobotoFont");
 
-            _ui.AddModule(new MouseInputModule(texture));
-
             _image = new ImageElement(texture);
             _text = new TextElement(font);
 
             _image.Color = Color.Black;
             _text.Text = "Test text";
 
-            _ui.Container.AddChild(_image);
-            _image.AddChild(_text);
+            _ui.AddModule(new MouseInputModule(texture));
+            //_ui.Container.AddChild(_image);
+            //_image.AddChild(_text);
         }
         protected override void Update(GameTime gameTime)
         {
@@ -59,6 +59,7 @@ namespace UILibTesting
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _image.LocalRotation = (float)gameTime.TotalGameTime.TotalSeconds * -5f;
+            _image.LocalPosition = new Vector2(MathF.Cos(_image.LocalRotation),MathF.Sin(_image.LocalRotation));
 
             _ui.Draw(gameTime);
 
